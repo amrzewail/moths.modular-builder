@@ -1,3 +1,5 @@
+using HouseBuilder.Editor.Controllers;
+using HouseBuilder.Editor.Views;
 using System;
 using System.Collections;
 using System.Collections.Generic;
@@ -5,31 +7,28 @@ using UnityEditor;
 using UnityEditor.UIElements;
 using UnityEngine;
 using UnityEngine.UIElements;
+using ILogger = HouseBuilder.Editor.Controllers.ILogger;
+using Logger = HouseBuilder.Editor.Controllers.Logger;
 
 namespace HouseBuilder.Editor
 {
-    public class BuilderEditor : EditorWindow
+    public class BuilderEditor : EditorWindow, IEditor
     {
-        [MenuItem("House Builder/Editor")]
-        public static void ShowWindow()
-        {
-            BuilderEditor editor = GetWindow<BuilderEditor>();
-            editor.titleContent = new GUIContent("House Builder");
-        }
 
-        public Vector3 gridSize => currentHouse == null ? Vector3.one : currentHouse.gridSize;
         public Color gridColor { get; private set; } = new Color(0, 1f, 0, 0.3f);
 
-        public GridEditor Grid { get; private set; }
+        public Materials Materials { get; private set; }
 
+        public ILogger Logger { get; private set; }
+        public IInputController Input { get; private set; }
+        public IGrid Grid { get; private set; }
+        public IHouse House { get; private set; }
+        public IPaletteManager Palettes { get; private set; }
+        public IPrefabPreviewer Previewer { get; private set; }
+        public ISceneEditor SceneEditor { get; private set; }
 
-        private VisualElement _header;
-        private VisualElement _body;
+        public bool IsHouseValid => House != null && House.hasReference;
 
-
-        private FloatField _levelHeightField;
-        private VisualElement _newHouseVE;
-        private HouseEditingVisualElement _houseEditingVE;
 
         public event Action OnUpdate;
         public event Action<SceneView> OnSceneGUI;
@@ -40,38 +39,85 @@ namespace HouseBuilder.Editor
         public event Action OnDisabled;
         public event Action OnEnabled;
 
-        public IHouse currentHouse { get; private set; }
+        [MenuItem("House Builder/Editor")]
+        public static void ShowWindow()
+        {
+            BuilderEditor editor = GetWindow<BuilderEditor>();
+            editor.titleContent = new GUIContent("House Builder");
+        }
 
+
+        public void CreateGUI()
+        {
+            Materials = Materials.Default();
+
+            Logger = new Logger();
+
+
+            Input = new InputController(Logger);
+            Grid = new SceneGrid();
+            Palettes = new PaletteManager(Logger);
+            Previewer = new PrefabPreviewer(Logger);
+            SceneEditor = new SceneEditor(this);
+
+            MainView mainView = new MainView(this);
+
+            rootVisualElement.Add(mainView);
+
+            OnSelectionChange();
+        }
+
+
+        private void UpdateGridValues()
+        {
+            if (IsHouseValid)
+            {
+                Grid.position = House.origin;
+                Grid.gridSize = House.gridSize;
+                Grid.oneLevelHeight = House.levelHeight;
+            }
+        }
+
+        private void CleanUp()
+        {
+            if (IsHouseValid)
+            {
+                House.ShowAllLevels();
+            }
+            if (Previewer != null)
+            {
+                Previewer.Clean();
+            }
+        }
+
+        #region Unity Events
 
         public void OnEnable()
         {
+            SceneView.duringSceneGui -= SceneGUICallback;
             SceneView.duringSceneGui += SceneGUICallback;
+
+            AssemblyReloadEvents.beforeAssemblyReload -= OnBeforeAssemblyReload;
+            AssemblyReloadEvents.beforeAssemblyReload += OnBeforeAssemblyReload;
+
+            EditorApplication.playModeStateChanged -= OnPlayModeChanged;
+            EditorApplication.playModeStateChanged += OnPlayModeChanged;
+
+
             OnEnabled?.Invoke();
         }
 
         public void OnDisable()
         {
             SceneView.duringSceneGui -= SceneGUICallback;
+            AssemblyReloadEvents.beforeAssemblyReload -= OnBeforeAssemblyReload;
+            EditorApplication.playModeStateChanged -= OnPlayModeChanged;
+
+            CleanUp();
+
             OnDisabled?.Invoke();
         }
 
-        public void CreateGUI()
-        {
-            Grid = new GridEditor();
-
-            _header = new VisualElement();
-            _body = new VisualElement();
-
-            rootVisualElement.Add(_header);
-            rootVisualElement.Add(_body);
-
-            _header.Add(_levelHeightField);
-
-            _newHouseVE = new NewHouseVisualElement();
-            _houseEditingVE = new HouseEditingVisualElement(this);
-
-            UpdateVisualElements();
-        }
 
         private void Update()
         {
@@ -82,6 +128,8 @@ namespace HouseBuilder.Editor
 
         private void OnDestroy()
         {
+            CleanUp();
+
             OnDestroyed?.Invoke();
         }
 
@@ -94,56 +142,55 @@ namespace HouseBuilder.Editor
         {
             OnBeforeSelectionChange?.Invoke();
 
-            currentHouse = null;
+            House = null;
 
             if (Selection.activeGameObject && Selection.activeGameObject.scene.IsValid())
             {
-                currentHouse = Selection.activeGameObject.GetComponent<IHouse>();
+                House = Selection.activeGameObject.GetComponent<IHouse>();
             }
 
             UpdateGridValues();
 
-            OnSelectionChanged?.Invoke(Selection.activeGameObject);
-
-
-            UpdateVisualElements();
-        }
-
-        private void UpdateGridValues()
-        {
-            if (currentHouse == null || currentHouse.hasReference == false) return;
-            if (currentHouse != null)
+            if (!IsHouseValid)
             {
-                Grid.position = currentHouse.origin;
-                Grid.gridSize = currentHouse.gridSize;
-                Grid.oneLevelHeight = currentHouse.levelHeight;
+                Previewer.Clean();
             }
+
+            OnSelectionChanged(Selection.activeGameObject);
         }
-
-        private void UpdateVisualElements()
-        {
-            _body.Clear();
-
-            if (currentHouse == null || currentHouse.hasReference == false)
-            {
-                _body.Add(_newHouseVE);
-            }
-            else
-            {
-                _body.Add(_houseEditingVE);
-            }
-        }
-
 
         private void SceneGUICallback(SceneView view)
         {
-            if (currentHouse != null && currentHouse.hasReference)
+            if (IsHouseValid)
             {
-                Grid.DrawGrid(gridColor);
+                HandleUtility.AddDefaultControl(GUIUtility.GetControlID(FocusType.Passive));
+
+                Grid.Draw(gridColor);
             }
 
+            Input.Update();
+
+            SceneEditor.OnSceneGUI(view);
+
             OnSceneGUI?.Invoke(view);
+
+            Input.Clear();
         }
+
+        private void OnPlayModeChanged(PlayModeStateChange obj)
+        {
+            CleanUp();
+        }
+
+        private void OnBeforeAssemblyReload()
+        {
+            CleanUp();
+
+        }
+
+
+        #endregion
+
 
     }
 }

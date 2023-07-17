@@ -6,6 +6,8 @@ namespace HouseBuilder
 {
     public class House : MonoBehaviour, IHouse
     {
+        private List<GameObject> _queryResult = new List<GameObject>();
+
         public bool hasReference => this;
         public Vector3 origin => transform.position;
 
@@ -34,9 +36,10 @@ namespace HouseBuilder
             module.transform.SetParent(child, true);
         }
 
-        public GameObject GetAtPosition(ModuleType type, int level, Vector3 worldPosition, float precision)
+        public List<GameObject> GetAtPosition(ModuleType type, int level, Vector3 worldPosition, float precision)
         {
             Transform levelChild = transform.Find($"Level{level}");
+            _queryResult.Clear();
             if (levelChild)
             {
                 Transform child = levelChild.Find(type.ToString());
@@ -44,11 +47,11 @@ namespace HouseBuilder
                 {
                     for (int i = 0; i < child.childCount; i++)
                     {
-                        if (Vector3.Distance(child.GetChild(i).position, worldPosition) < precision) return child.GetChild(i).gameObject;
+                        if (Vector3.Distance(child.GetChild(i).position, worldPosition) < precision) _queryResult.Add(child.GetChild(i).gameObject);
                     }
                 }
             }
-            return null;
+            return _queryResult;
 
         }
 

@@ -7,26 +7,30 @@ using UnityEngine.UIElements;
 
 namespace HouseBuilder.Editor
 {
-    public class PaletteSetList : VisualElement
+    public class SelectionMenu<T> : VisualElement
     {
         private Button _button;
-        private PaletteSet[] _sets;
-        private PaletteSet _current;
+        private T[] _sets;
+        private T _current;
 
-        public event Func<PaletteSet, bool> onSelected;
+        public event Func<T, bool> onSelected;
 
-        public PaletteSetList()
+        private Func<T, string> GetName;
+
+        public SelectionMenu()
         {
             var button = new Button();
             this.Add(button);
         }
 
-        public void Refresh(PaletteSet[] sets)
+        public void Refresh(T[] sets, Func<T, string> nameSelector)
         {
             this.Clear();
 
+            GetName = nameSelector;
+
             _button = new Button(OnButtonClick);
-            _button.text = sets[0].name;
+            _button.text = GetName(sets[0]);
             this.Add(_button);
 
             _sets = sets;
@@ -40,7 +44,7 @@ namespace HouseBuilder.Editor
             for (int i = 0; i < _sets.Length; i++)
             {
                 int index = i;
-                menu.AddItem(new GUIContent(_sets[i].name), _current == _sets[i], () => OnItemSelected(index));
+                menu.AddItem(new GUIContent(GetName(_sets[i])), EqualityComparer<T>.Default.Equals(_current, _sets[i]), () => OnItemSelected(index));
             }
 
             // display the menu
@@ -52,7 +56,7 @@ namespace HouseBuilder.Editor
             if (onSelected(_sets[index]))
             {
                 _current = _sets[index];
-                _button.text = _sets[index].name;
+                _button.text = GetName(_sets[index]);
             }
         }
     }

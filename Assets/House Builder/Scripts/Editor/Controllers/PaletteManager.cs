@@ -1,0 +1,64 @@
+using System.Collections;
+using System.Collections.Generic;
+using UnityEngine;
+
+namespace HouseBuilder.Editor.Controllers
+{
+    public class PaletteManager : IPaletteManager
+    {
+        private ModuleType _currentModuleType;
+        private ILogger _logger;
+
+        public bool IsLoaded { get; private set; }
+
+        public PaletteSet[] PaletteSets { get; private set; }
+
+        public PaletteSet PaletteSet { get; set; }
+        public ModuleType ModuleType
+        {
+            get => _currentModuleType;
+            set
+            {
+                _currentModuleType = value;
+                if (!PaletteSet) return;
+                if (PaletteSet.Palettes == null) return;
+
+                for (int i = 0; i < PaletteSet.Palettes.Length; i++)
+                {
+                    if (PaletteSet.Palettes[i].Type == ModuleType)
+                    {
+                        Palette = PaletteSet.Palettes[i];
+                        break;
+                    }
+                }
+            }
+        }
+
+        public ModulePalette Palette { get; private set; }
+
+        public PaletteManager(ILogger logger)
+        {
+            _logger = logger;
+        }
+
+        public bool LoadPaletteSets()
+        {
+            IsLoaded = false;
+            PaletteSets = Resources.LoadAll<PaletteSet>("");
+            PaletteSet = null;
+            if (PaletteSets.Length > 0)
+            {
+                PaletteSet = PaletteSets[0];
+                if (PaletteSet.Palettes.Length > 0)
+                {
+                    Palette = PaletteSet.Palettes[0];
+                }
+                IsLoaded = true;
+                _logger.Log(nameof(PaletteManager), "Palette sets loaded successfully.");
+                return true;
+            }
+            _logger.Error(nameof(PaletteManager), "No palette sets found in Resources.");
+            return false;
+        }
+    }
+}

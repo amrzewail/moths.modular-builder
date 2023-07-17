@@ -13,10 +13,9 @@ namespace HouseBuilder
 
         float levelHeight { get; }
 
-
         void Add(ModuleType type, int level, GameObject module);
 
-        GameObject GetAtPosition(ModuleType type, int level, Vector3 worldPosition, float precision);
+        List<GameObject> GetAtPosition(ModuleType type, int level, Vector3 worldPosition, float precision);
 
         void HideLevelRange(int minInclusive, int maxExlusive);
 

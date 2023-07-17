@@ -3,9 +3,9 @@ using System.Collections.Generic;
 using UnityEditor;
 using UnityEngine;
 
-namespace HouseBuilder.Editor
+namespace HouseBuilder.Editor.Controllers
 {
-    public class GridEditor
+    public class SceneGrid : IGrid
     {
         private int _totalHeightIndex;
 
@@ -35,7 +35,17 @@ namespace HouseBuilder.Editor
 
         public int LevelHeightCount => Mathf.Max((int)(oneLevelHeight / gridSize.y), 0);
 
-        public int CurrentHeightIndex => Mathf.FloorToInt(totalHeightIndex % oneLevelHeight);
+        public int CurrentHeightIndex
+        {
+            get
+            {
+                return Mathf.FloorToInt(totalHeightIndex % oneLevelHeight);
+            }
+            set
+            {
+                totalHeightIndex = CurrentLevelIndex * LevelHeightCount + value;
+            }
+        }
 
         public int CurrentLevelIndex
         {
@@ -44,19 +54,13 @@ namespace HouseBuilder.Editor
                 if (LevelHeightCount == 0) return 0;
                 return Mathf.FloorToInt(totalHeightIndex / LevelHeightCount);
             }
+            set
+            {
+                totalHeightIndex = value * LevelHeightCount;
+            }
         }
 
-        public void SetLevelIndex(int index)
-        {
-            totalHeightIndex = index * LevelHeightCount;
-        }
-
-        public void SetHeightIndex(int index)
-        {
-            totalHeightIndex = CurrentLevelIndex * LevelHeightCount + index;
-        }
-
-        public void DrawGrid(Color color)
+        public void Draw(Color color)
         {
             var handlesColor = Handles.color;
 
