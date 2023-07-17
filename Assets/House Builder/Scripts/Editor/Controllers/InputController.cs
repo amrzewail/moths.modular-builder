@@ -7,6 +7,7 @@ namespace HouseBuilder.Editor.Controllers
     public class InputController : IInputController
     {
         private readonly ILogger _logger;
+        private bool _isLeftClickDown = false;
 
         public KeyCommand Command { get; private set; } = KeyCommand.None;
 
@@ -20,10 +21,19 @@ namespace HouseBuilder.Editor.Controllers
         public void Update()
         {
 
+
+            if (Event.current.keyCode == KeyCode.F && Event.current.type == EventType.KeyDown)
+            {
+                Command = KeyCommand.Frame;
+                Event.current.Use();
+                return;
+            }
+
+
             if (Event.current.alt && Event.current.type == EventType.ScrollWheel)
             {
                 Vector2 delta = Event.current.delta;
-                ScrollWheel = -Mathf.RoundToInt(Mathf.Sign(delta.y));
+                ScrollWheel = Mathf.RoundToInt(Mathf.Sign(delta.y));
                 Command = KeyCommand.Rotate;
                 Event.current.Use();
                 return;
@@ -60,16 +70,23 @@ namespace HouseBuilder.Editor.Controllers
                 return;
             }
 
-
-            if (Event.current.type == EventType.MouseUp || Event.current.type == EventType.MouseDrag)
+            if (Event.current.alt == false && Event.current.control == false)
             {
-                if (Event.current.button == 0 && !Event.current.alt && !Event.current.control)
+                if (Event.current.button == 0 && Event.current.type == EventType.MouseDown)
                 {
-                    Command = KeyCommand.Instantiate;
-                    return;
+                    _isLeftClickDown = true;
+                }
+                if (Event.current.button == 0 && Event.current.type == EventType.MouseUp || Event.current.type == EventType.MouseDrag)
+                {
+                    if (_isLeftClickDown)
+                    {
+                        Command = KeyCommand.Instantiate;
+                    }
                 }
             }
 
+            if (Event.current.type == EventType.MouseUp && Event.current.button == 0) _isLeftClickDown = false;
+            if (Event.current.alt || Event.current.control) _isLeftClickDown = false;
 
         }
 

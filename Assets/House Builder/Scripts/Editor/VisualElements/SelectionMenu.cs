@@ -14,6 +14,7 @@ namespace HouseBuilder.Editor
         private T _current;
 
         public event Func<T, bool> onSelected;
+        public event Func<T, bool> isItemDisabled;
 
         private Func<T, string> GetName;
 
@@ -44,7 +45,14 @@ namespace HouseBuilder.Editor
             for (int i = 0; i < _sets.Length; i++)
             {
                 int index = i;
-                menu.AddItem(new GUIContent(GetName(_sets[i])), EqualityComparer<T>.Default.Equals(_current, _sets[i]), () => OnItemSelected(index));
+                if (isItemDisabled != null && isItemDisabled(_sets[i]))
+                {
+                    menu.AddDisabledItem(new GUIContent(GetName(_sets[i])), false);
+                }
+                else
+                {
+                    menu.AddItem(new GUIContent(GetName(_sets[i])), EqualityComparer<T>.Default.Equals(_current, _sets[i]), () => OnItemSelected(index));
+                }
             }
 
             // display the menu
@@ -53,11 +61,16 @@ namespace HouseBuilder.Editor
 
         private void OnItemSelected(int index)
         {
-            if (onSelected(_sets[index]))
+            if (onSelected == null || onSelected(_sets[index]))
             {
-                _current = _sets[index];
-                _button.text = GetName(_sets[index]);
+                Select(_sets[index]);
             }
+        }
+
+        public void Select(T item)
+        {
+            _current = item;
+            _button.text = GetName(_current);
         }
     }
 }

@@ -119,7 +119,7 @@ namespace HouseBuilder.Editor.Controllers
                 case KeyCommand.Instantiate:
                     if (_editor.Previewer.Prefab)
                     {
-                        if (!CheckForDuplication(position, _editor.Previewer.eulerAngles, _editor.Previewer.Prefab))
+                        if (!CheckForDuplication(_editor.Previewer.position, _editor.Previewer.eulerAngles, _editor.Previewer.Prefab))
                         {
                             GameObject module = InstantiatePreviewPrefab();
                         }
@@ -181,6 +181,15 @@ namespace HouseBuilder.Editor.Controllers
                     _editor.Grid.totalHeightIndex += _editor.Input.ScrollWheel;
 
                     _editor.Logger.Log(nameof(SceneEditor), $"Change grid height {_editor.Grid.totalHeightIndex}");
+
+                    break;
+
+                case KeyCommand.Frame:
+
+                    if (_editor.IsHouseValid)
+                    {
+                        view.Frame(new Bounds(position, _editor.Grid.gridSize * _editor.Grid.LevelHeightCount * 2), false);
+                    }
 
                     break;
             }

@@ -14,7 +14,6 @@ namespace HouseBuilder.Editor
 {
     public class BuilderEditor : EditorWindow, IEditor
     {
-
         public Color gridColor { get; private set; } = new Color(0, 1f, 0, 0.3f);
 
         public Materials Materials { get; private set; }
@@ -38,6 +37,8 @@ namespace HouseBuilder.Editor
         public event Action OnFocused;
         public event Action OnDisabled;
         public event Action OnEnabled;
+
+
 
         [MenuItem("House Builder/Editor")]
         public static void ShowWindow()
@@ -161,14 +162,14 @@ namespace HouseBuilder.Editor
 
         private void SceneGUICallback(SceneView view)
         {
+            Input.Update();
+
             if (IsHouseValid)
             {
                 HandleUtility.AddDefaultControl(GUIUtility.GetControlID(FocusType.Passive));
 
                 Grid.Draw(gridColor);
             }
-
-            Input.Update();
 
             SceneEditor.OnSceneGUI(view);
 

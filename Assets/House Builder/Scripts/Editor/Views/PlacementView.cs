@@ -26,19 +26,12 @@ namespace HouseBuilder.Editor.Views
 
         }
 
-        public void Refresh()
-        {
-            if (_editor.Palettes.LoadPaletteSets())
-            {
-                _paletteSetSelection.Refresh(_editor.Palettes.PaletteSets, x => x.name);
-            }
-            _editor.Palettes.ModuleType = (ModuleType)_enumModuleTypes.value;
-            UpdateModulesGrid();
-        }
 
         private void CreateGUI()
         {
             _paletteSetSelection = new SelectionMenu<PaletteSet>();
+            _paletteSetSelection.onSelected += PaletteSetSelectCallback;
+            _paletteSetSelection.isItemDisabled += (paletteSet) => paletteSet.Palettes.Length == 0;
 
             _enumModuleTypes = new EnumField("Module Type", ModuleType.Wall);
             _enumModuleTypes.RegisterCallback<ChangeEvent<Enum>>(ModuleChangeCallback);
@@ -61,6 +54,28 @@ namespace HouseBuilder.Editor.Views
             this.Add(scrollView);
         }
 
+
+        public void Refresh()
+        {
+            if (_editor.Palettes.LoadPaletteSets())
+            {
+                _paletteSetSelection.Refresh(_editor.Palettes.PaletteSets, x => x.name);
+                _paletteSetSelection.Select(_editor.Palettes.PaletteSet);
+            }
+            _editor.Palettes.ModuleType = (ModuleType)_enumModuleTypes.value;
+            UpdateModulesGrid();
+        }
+
+        private bool PaletteSetSelectCallback(PaletteSet set)
+        {
+            _editor.Palettes.PaletteSet = set;
+            _editor.Logger.Log(nameof(PlacementView), $"Changed palette set to {set.name}");
+
+            _enumModuleTypes.value = _editor.Palettes.ModuleType;
+            UpdateModulesGrid();
+            return true;
+        }
+
         private void RaiseCallback()
         {
             _editor.SceneEditor.RaiseHeight();
@@ -77,6 +92,7 @@ namespace HouseBuilder.Editor.Views
         private void UpdateModulesGrid()
         {
             _grid.Clear();
+            if (!_editor.Palettes.Palette) return;
             int i = 0;
             foreach(var prefab in _editor.Palettes.Palette.Prefabs)
             {

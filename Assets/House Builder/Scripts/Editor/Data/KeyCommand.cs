@@ -13,5 +13,6 @@ namespace HouseBuilder.Editor
         Rotate,
         Flip,
         ChangeHeight,
+        Frame,
     }
 }

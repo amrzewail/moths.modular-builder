@@ -90,8 +90,10 @@ namespace HouseBuilder.Editor.Controllers
                 eulerAngles = _lastEulerAngles.Value;
             }
 
-
-            _logger.Log(nameof(PrefabPreviewer), $"Change preview prefab to {prefab.name}.");
+            if (prefab != Prefab)
+            {
+                _logger.Log(nameof(PrefabPreviewer), $"Change preview prefab to {prefab.name}.");
+            }
             Prefab = prefab;
 
             Show();
