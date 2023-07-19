@@ -19,23 +19,32 @@ namespace HouseBuilder.Editor
         public PrefabButtonVisualElement(GameObject prefab)
         {
             _targetPrefab = prefab;
-            _previewTexture = AssetPreview.GetAssetPreview(prefab);
 
             this.style.unityBackgroundScaleMode = ScaleMode.ScaleToFit;
-            this.style.backgroundImage = _previewTexture;
 
-            if (_previewTexture)
-            {
-                this.style.minHeight = _previewTexture.height;
-                this.style.maxWidth = _previewTexture.width;
-            }
 
             Label label = new Label(prefab.name);
             this.Add(label);
 
             base.clicked += ClickCallback;
 
-            //this.image = _previewTexture;
+            RefreshPreview();
+        }
+
+        private async void RefreshPreview()
+        {
+            _previewTexture = null;
+            while(_previewTexture == null)
+            {
+                _previewTexture = AssetPreview.GetAssetPreview(prefab);
+
+                this.style.backgroundImage = _previewTexture;
+
+                if (_previewTexture == null) await System.Threading.Tasks.Task.Delay(100);
+            }
+            this.style.minHeight = _previewTexture.height;
+            this.style.maxWidth = _previewTexture.width;
+
         }
 
         private void ClickCallback()

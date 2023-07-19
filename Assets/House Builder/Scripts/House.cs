@@ -11,11 +11,18 @@ namespace HouseBuilder
         public bool hasReference => this;
         public Vector3 origin => transform.position;
 
+        public Quaternion rotation => transform.rotation;
+
         [SerializeField] Vector3 _gridSize = Vector3.one;
-        [SerializeField] float _levelHeight = 3;
+        [SerializeField] int _levelGridHeight = 3;
 
         public Vector3 gridSize => _gridSize;
-        public float levelHeight => _levelHeight;
+        public int levelGridHeight => _levelGridHeight;
+
+        private void OnValidate()
+        {
+            _levelGridHeight = Mathf.Max(1, _levelGridHeight);
+        }
 
         public void Add(ModuleType type, int level, GameObject module)
         {
@@ -89,7 +96,7 @@ namespace HouseBuilder
                 {
                     for (int i = 0; i < child.childCount; i++)
                     {
-                        if (Mathf.Abs(child.GetChild(i).transform.localPosition.y - (levelHeight * level + heightIndex * gridSize.y)) > 0.1f) continue;
+                        if (Mathf.Abs(child.GetChild(i).transform.localPosition.y - (levelGridHeight * level + heightIndex * gridSize.y)) > 0.1f) continue;
                         list.Add(child.GetChild(i).gameObject);
                     }
                 }

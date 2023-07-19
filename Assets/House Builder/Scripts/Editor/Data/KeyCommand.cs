@@ -7,12 +7,15 @@ namespace HouseBuilder.Editor
     public enum KeyCommand
     {
         None,
-        Instantiate,
+        LeftMouseButtonUp,
         PrepareDelete,
         Delete,
         Rotate,
         Flip,
         ChangeHeight,
         Frame,
+        UnselectedPrefab,
+        HighlightDrag,
+        HighlightClick,
     }
 }

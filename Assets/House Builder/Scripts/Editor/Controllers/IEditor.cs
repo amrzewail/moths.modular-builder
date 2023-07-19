@@ -28,5 +28,9 @@ namespace HouseBuilder.Editor.Controllers
         IPrefabPreviewer Previewer { get; }
         ISceneEditor SceneEditor { get; }
 
+        IOutliner Outliner { get; }
+
+        ISelector Selector { get; }
+
     }
 }

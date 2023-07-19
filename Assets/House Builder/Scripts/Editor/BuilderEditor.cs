@@ -26,6 +26,9 @@ namespace HouseBuilder.Editor
         public IPrefabPreviewer Previewer { get; private set; }
         public ISceneEditor SceneEditor { get; private set; }
 
+        public IOutliner Outliner { get; private set; }
+        public ISelector Selector { get; private set; }
+
         public bool IsHouseValid => House != null && House.hasReference;
 
 
@@ -60,6 +63,8 @@ namespace HouseBuilder.Editor
             Palettes = new PaletteManager(Logger);
             Previewer = new PrefabPreviewer(Logger);
             SceneEditor = new SceneEditor(this);
+            Outliner = new Outliner(this);
+            Selector = new ModuleObjectSelector(this);
 
             MainView mainView = new MainView(this);
 
@@ -74,8 +79,9 @@ namespace HouseBuilder.Editor
             if (IsHouseValid)
             {
                 Grid.position = House.origin;
+                Grid.rotation = House.rotation;
                 Grid.gridSize = House.gridSize;
-                Grid.oneLevelHeight = House.levelHeight;
+                Grid.oneLevelHeight = House.levelGridHeight;
             }
         }
 
@@ -144,6 +150,7 @@ namespace HouseBuilder.Editor
             OnBeforeSelectionChange?.Invoke();
 
             House = null;
+            Outliner.RemoveAll();
 
             if (Selection.activeGameObject && Selection.activeGameObject.scene.IsValid())
             {
@@ -166,7 +173,11 @@ namespace HouseBuilder.Editor
 
             if (IsHouseValid)
             {
-                HandleUtility.AddDefaultControl(GUIUtility.GetControlID(FocusType.Passive));
+
+                if (Event.current.type == EventType.Layout)
+                {
+                    HandleUtility.AddDefaultControl(GUIUtility.GetControlID(FocusType.Passive));
+                }
 
                 Grid.Draw(gridColor);
             }
@@ -174,8 +185,6 @@ namespace HouseBuilder.Editor
             SceneEditor.OnSceneGUI(view);
 
             OnSceneGUI?.Invoke(view);
-
-            Input.Clear();
         }
 
         private void OnPlayModeChanged(PlayModeStateChange obj)

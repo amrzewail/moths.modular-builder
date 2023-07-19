@@ -11,6 +11,7 @@ namespace HouseBuilder.Editor.Controllers
 
         public Vector3 gridSize { get; set; }
         public Vector3 position { get; set; }
+        public Quaternion rotation { get; set; }
         public float oneLevelHeight { get; set; }
 
         public int totalHeightIndex
@@ -64,28 +65,50 @@ namespace HouseBuilder.Editor.Controllers
         {
             var handlesColor = Handles.color;
 
+            Matrix4x4 defaultMatrix = Handles.matrix;
+
+            Handles.matrix = Matrix4x4.TRS(Center, rotation, Vector3.one);
             Handles.color = color;
             Handles.zTest = UnityEngine.Rendering.CompareFunction.LessEqual;
             float lineLength = 100 * gridSize.z;
-            for (float z = Center.z - lineLength; z < Center.z + lineLength; z += gridSize.z)
+            for (float z = 0 - lineLength; z < 0 + lineLength; z += gridSize.z)
             {
-                Handles.DrawLine(new Vector3(Center.x - lineLength, Center.y, z), new Vector3(Center.x + lineLength, Center.y, z));
+                Handles.DrawLine(new Vector3(0 - lineLength, 0, z), new Vector3(0 + lineLength, 0, z));
             }
             lineLength = 100 * gridSize.x;
-            for (float x = Center.x - lineLength; x < Center.x + lineLength; x += gridSize.x)
+            for (float x = 0 - lineLength; x < 0 + lineLength; x += gridSize.x)
             {
-                Handles.DrawLine(new Vector3(x, Center.y, Center.z - lineLength), new Vector3(x, Center.y, Center.z + lineLength));
+                Handles.DrawLine(new Vector3(x, 0, 0 - lineLength), new Vector3(x, 0, 0 + lineLength));
             }
 
             Handles.color = handlesColor;
+
+            Handles.matrix = defaultMatrix;
         }
 
         public Vector3 Snap(Vector3 position)
         {
+            position = GridToWorldSpace(position);
             position.x = BuilderEditorUtility.Snap(position.x, gridSize.x,/* _editor.GRID_SIZE.x / 2*/0);
             position.z = BuilderEditorUtility.Snap(position.z, gridSize.z, /*_editor.GRID_SIZE.z / 2*/0);
-            position.y = Center.y;
+            position = WorldToGridSpace(position);
             return position;
+        }
+
+        private Vector3 GridToWorldSpace(Vector3 point)
+        {
+            point -= Center;
+            Matrix4x4 transformationMatrix = Matrix4x4.TRS(Vector3.zero, Quaternion.Inverse(rotation), Vector3.one);
+            Vector3 p = transformationMatrix * point;
+            return p;
+        }
+
+        private Vector3 WorldToGridSpace(Vector3 point)
+        {
+            Matrix4x4 transformationMatrix = Matrix4x4.TRS(Vector3.zero, rotation, Vector3.one);
+            Vector3 p = transformationMatrix * point;
+            p += Center;
+            return p;
         }
     }
 }

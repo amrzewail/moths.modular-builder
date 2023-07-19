@@ -115,7 +115,9 @@ namespace HouseBuilder.Editor.Views
 
         private void Update()
         {
-            _transformLabel.text = $"Rotation: {Mathf.RoundToInt(_editor.Previewer.eulerAngles.y)} {(_editor.Previewer.localScale.x < 0 ? "Flipped" : "")}";
+            float rotationY = _editor.Previewer.eulerAngles.y;
+            rotationY -= _editor.Grid.rotation.eulerAngles.y;
+            _transformLabel.text = $"Rotation: {Mathf.RoundToInt(rotationY)} {(_editor.Previewer.localScale.x < 0 ? "Flipped" : "")}";
         }
     }
 }

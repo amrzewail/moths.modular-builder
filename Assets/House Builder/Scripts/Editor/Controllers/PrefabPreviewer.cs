@@ -29,6 +29,7 @@ namespace HouseBuilder.Editor.Controllers
                 _pointer.Target.transform.position = value;
             }
         }
+
         public Vector3 eulerAngles
         {
             get

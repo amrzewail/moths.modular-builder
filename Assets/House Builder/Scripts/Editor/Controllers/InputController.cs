@@ -8,10 +8,12 @@ namespace HouseBuilder.Editor.Controllers
     {
         private readonly ILogger _logger;
         private bool _isLeftClickDown = false;
+        private bool _isLeftClickHighlightDown = false;
 
         public KeyCommand Command { get; private set; } = KeyCommand.None;
 
         public int ScrollWheel { get; private set; }
+        public Vector2 MousePosition { get; private set; }
 
         public InputController(ILogger logger)
         {
@@ -20,7 +22,15 @@ namespace HouseBuilder.Editor.Controllers
 
         public void Update()
         {
+            Clear();
 
+            MousePosition = Event.current.mousePosition;
+
+            if (Event.current.keyCode == KeyCode.Escape && Event.current.type == EventType.KeyDown)
+            {
+                Command = KeyCommand.UnselectedPrefab;
+                return;
+            }
 
             if (Event.current.keyCode == KeyCode.F && Event.current.type == EventType.KeyDown)
             {
@@ -54,6 +64,13 @@ namespace HouseBuilder.Editor.Controllers
                 return;
             }
 
+
+            if (Event.current.type == EventType.KeyUp && Event.current.keyCode == KeyCode.Backspace)
+            {
+                Command = KeyCommand.Delete;
+                return;
+            }
+
             if (Event.current.shift && !Event.current.alt && !Event.current.control)
             {
                 Command = KeyCommand.PrepareDelete;
@@ -70,6 +87,28 @@ namespace HouseBuilder.Editor.Controllers
                 return;
             }
 
+            if (Event.current.control && !Event.current.alt && Event.current.button == 0)
+            {
+                if (Event.current.type == EventType.MouseDown)
+                {
+                    _isLeftClickHighlightDown = true;
+                }
+
+                if (_isLeftClickHighlightDown)
+                {
+                    if (Event.current.type == EventType.MouseUp)
+                    {
+                        Command = KeyCommand.HighlightClick;
+                        return;
+                    }
+                    else if (Event.current.type == EventType.MouseDrag)
+                    {
+                        Command = KeyCommand.HighlightDrag;
+                        return;
+                    }
+                }
+            }
+
             if (Event.current.alt == false && Event.current.control == false)
             {
                 if (Event.current.button == 0 && Event.current.type == EventType.MouseDown)
@@ -80,13 +119,18 @@ namespace HouseBuilder.Editor.Controllers
                 {
                     if (_isLeftClickDown)
                     {
-                        Command = KeyCommand.Instantiate;
+                        Command = KeyCommand.LeftMouseButtonUp;
                     }
                 }
             }
 
-            if (Event.current.type == EventType.MouseUp && Event.current.button == 0) _isLeftClickDown = false;
+            if (Event.current.type == EventType.MouseUp && Event.current.button == 0)
+            {
+                _isLeftClickDown = false;
+                _isLeftClickHighlightDown = false;
+            } 
             if (Event.current.alt || Event.current.control) _isLeftClickDown = false;
+            if (Event.current.alt) _isLeftClickHighlightDown = false;
 
         }
 

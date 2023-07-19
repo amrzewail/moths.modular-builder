@@ -8,14 +8,16 @@ namespace HouseBuilder.Editor.Controllers
     public class SceneEditor : ISceneEditor
     {
         private readonly IEditor _editor;
-        private readonly IPrefabPreviewer _previewer;
+
+        private Vector3 _previewExtraEulerAngles;
+        private GameObject _lastDeletingTarget;
+
+        private readonly Color _deleteColor = new Color(0.5f, 0, 0, 0.75f);
+        private readonly Color _selectedColor = new Color(0, 0, 0.5f, 0.75f);
 
         public SceneEditor(IEditor editor)
         {
             _editor = editor;
-            _previewer = new PrefabPreviewer(_editor.Logger);
-
-            _previewer.material = _editor.Materials.deletingModule;
         }
 
         private bool CheckForDuplication(Vector3 position, Vector3 eulerAngles, GameObject prefab)
@@ -39,9 +41,15 @@ namespace HouseBuilder.Editor.Controllers
         {
             var g = _editor.House.GetAtPosition(_editor.Palettes.ModuleType, _editor.Grid.CurrentLevelIndex, position, _editor.Grid.gridSize.magnitude / 4f);
             if (g.Count == 0) return;
+            DestroyGameObject(g[0]);
+        }
 
-            Undo.DestroyObjectImmediate(g[0]);
-            _editor.Logger.Log(nameof(SceneEditor), "Deleted module prefab.");
+        private void DestroyGameObject(GameObject g)
+        {
+            if (!g) return;
+
+            _editor.Logger.Log(nameof(SceneEditor), $"Deleted module {g.name}.");
+            Undo.DestroyObjectImmediate(g);
         }
 
 
@@ -97,26 +105,41 @@ namespace HouseBuilder.Editor.Controllers
             Vector3 position = BuilderEditorUtility.MouseToWorldPosition(view, _editor.Grid.Center);
             position = _editor.Grid.Snap(position);
 
+            Quaternion gridRotation = _editor.Grid.rotation;
+
             Color handlesColor = Handles.color;
 
             switch (_editor.Input.Command)
             {
                 case KeyCommand.None:
-                    _previewer.Clean();
                     Handles.zTest = UnityEngine.Rendering.CompareFunction.Less;
                     Handles.color = Color.green;
                     Handles.DrawWireDisc(position, Vector3.up, _editor.Grid.gridSize.magnitude / 4);
+
+                    if (_lastDeletingTarget)
+                    {
+                        _editor.Outliner.RemoveGameObject(_lastDeletingTarget);
+                        _lastDeletingTarget = null;
+                    }
+
                     if (_editor.Previewer.Prefab)
                     {
+                        _editor.Outliner.RemoveAll();
                         _editor.Previewer.Show();
                         _editor.Previewer.position = position;
+                        _editor.Previewer.eulerAngles = (gridRotation * _editor.Previewer.Prefab.transform.rotation).eulerAngles + _previewExtraEulerAngles;
                     }
 
                     view.Repaint();
 
                     break;
 
-                case KeyCommand.Instantiate:
+                case KeyCommand.UnselectedPrefab:
+                    _editor.Previewer.Clean();
+
+                    break;
+
+                case KeyCommand.LeftMouseButtonUp:
                     if (_editor.Previewer.Prefab)
                     {
                         if (!CheckForDuplication(_editor.Previewer.position, _editor.Previewer.eulerAngles, _editor.Previewer.Prefab))
@@ -131,31 +154,37 @@ namespace HouseBuilder.Editor.Controllers
                     Handles.color = Color.red;
                     Handles.DrawWireDisc(position, Vector3.up, _editor.Grid.gridSize.magnitude / 4);
                     _editor.Previewer.Hide();
+                    _editor.Selector.Clear();
 
-
-                    List<GameObject> deletingElements = _editor.House.GetAtPosition(_editor.Palettes.ModuleType, _editor.Grid.CurrentLevelIndex, position, _editor.Grid.gridSize.magnitude / 4f);
-                    GameObject deletingElement = deletingElements.Count > 0 ? deletingElements[0] : null;
-                    if (deletingElement)
+                    List<GameObject> deletingTargets = _editor.House.GetAtPosition(_editor.Palettes.ModuleType, _editor.Grid.CurrentLevelIndex, position, _editor.Grid.gridSize.magnitude / 4f);
+                    GameObject deletingTarget = deletingTargets.Count > 0 ? deletingTargets[0] : null;
+                    if (_lastDeletingTarget && _lastDeletingTarget != deletingTarget)
                     {
-                        _previewer.SetPrefab(deletingElement);
-                        _previewer.position = deletingElement.transform.position;
-                        _previewer.eulerAngles = deletingElement.transform.eulerAngles;
-                        _previewer.localScale = deletingElement.transform.localScale * 1.1f;
+                        _editor.Outliner.RemoveGameObject(_lastDeletingTarget);
                     }
-                    else
-                    {
-                        _previewer.Clean();
-                    }
+                    _editor.Outliner.AddGameObject(deletingTarget, _deleteColor);
 
+
+                    _lastDeletingTarget = deletingTarget;
 
                     view.Repaint();
                     break;
 
                 case KeyCommand.Delete:
-                    DestroyAtPosition(position);
 
-                    _editor.Logger.Log(nameof(SceneEditor), "Try delete module prefab.");
+                    if (_editor.Selector.Current)
+                    {
+                        foreach(var g in _editor.Selector.CurrentMultiple)
+                        {
+                            DestroyGameObject(g);
+                        }
+                    }
+                    else
+                    {
 
+                        DestroyAtPosition(position);
+                        _editor.Logger.Log(nameof(SceneEditor), "Try delete module prefab.");
+                    }
                     break;
 
                 case KeyCommand.Flip:
@@ -168,12 +197,10 @@ namespace HouseBuilder.Editor.Controllers
                     break;
 
                 case KeyCommand.Rotate:
-                    Vector3 eulerAngles = _editor.Previewer.eulerAngles;
-                    eulerAngles.y = (eulerAngles.y + 90 * _editor.Input.ScrollWheel) % 360;
-                    if (eulerAngles.y < 0) eulerAngles.y += 360;
-                    _editor.Previewer.eulerAngles = eulerAngles;
+                    _previewExtraEulerAngles.y = (_previewExtraEulerAngles.y + 90 * _editor.Input.ScrollWheel) % 360;
+                    _editor.Previewer.eulerAngles = (gridRotation * _editor.Previewer.Prefab.transform.rotation).eulerAngles + _previewExtraEulerAngles;
 
-                    _editor.Logger.Log(nameof(SceneEditor), $"Rotate module prefab {eulerAngles}.");
+                    _editor.Logger.Log(nameof(SceneEditor), $"Rotate module prefab {_previewExtraEulerAngles}.");
 
                     break;
 

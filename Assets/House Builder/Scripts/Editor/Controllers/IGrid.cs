@@ -8,6 +8,7 @@ namespace HouseBuilder.Editor.Controllers
     {
         public Vector3 gridSize { get; set; }
         public Vector3 position { get; set; }
+        public Quaternion rotation { get; set; }
         public float oneLevelHeight { get; set; }
 
         public int totalHeightIndex { get; set; }

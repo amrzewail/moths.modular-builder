@@ -10,6 +10,7 @@ namespace HouseBuilder.Editor.Controllers
 
         int ScrollWheel { get; }
 
+        Vector2 MousePosition { get; }
 
         void Update();
 

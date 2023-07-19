@@ -9,9 +9,11 @@ namespace HouseBuilder
         bool hasReference { get; }
         Vector3 origin { get; }
 
+        Quaternion rotation { get; }
+
         Vector3 gridSize { get; }
 
-        float levelHeight { get; }
+        int levelGridHeight { get; }
 
         void Add(ModuleType type, int level, GameObject module);
 
