@@ -12,6 +12,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 97dd6ad12300bef4890188b3c1c77de1, type: 3}
   m_Name: Floors
   m_EditorClassIdentifier: 
-  <Type>k__BackingField: 20
-  <Prefabs>k__BackingField:
+  _type: Floor
+  _prefabs:
   - {fileID: 7185106036931571147, guid: cb72c0d57a49d7e46b0ef62cc15d9ee4, type: 3}
+  - {fileID: 6583502311905398729, guid: 111c76ee4f558ec488ddaf7f6339027a, type: 3}

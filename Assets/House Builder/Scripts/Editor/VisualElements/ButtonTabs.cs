@@ -8,7 +8,11 @@ namespace HouseBuilder.Editor
 {
     public class ButtonTabs : VisualElement
     {
+        private readonly Color _selectedColor = new Color(0, 0.7f, 0, 1);
+
         private List<Button> _buttons = new List<Button>();
+        private Dictionary<int, Color> _bgColorOverrides = new Dictionary<int, Color>();
+
         public event Action<int, string> onTabClicked;
 
         public int CurrentTab { get; private set; }
@@ -18,6 +22,9 @@ namespace HouseBuilder.Editor
         public Label label;
 
         private VisualElement _buttonsContainer;
+
+        public IStyle tabsStyle { get => _buttonsContainer.style; }
+
 
         public ButtonTabs(params string[] tabs)
         {
@@ -77,12 +84,35 @@ namespace HouseBuilder.Editor
         {
             if (index < 0) return;
             if (index >= _buttons.Count) return;
+            CurrentTab = index;
+            UpdateTabBackgroundColors();
+        }
+
+        public void ClearBackgroundColorOverrides()
+        {
+            _bgColorOverrides.Clear();
+        }
+
+        public void OverrideTabBackgroundColor(int index, Color color)
+        {
+            _bgColorOverrides[index] = color;
+        }
+
+        public void UpdateTabBackgroundColors()
+        {
             for (int i = 0; i < _buttons.Count; i++)
             {
-                _buttons[i].style.backgroundColor = Color.clear;
+                if (_bgColorOverrides.ContainsKey(i))
+                {
+                    _buttons[i].style.backgroundColor = _bgColorOverrides[i];
+                }
+                else
+                {
+                    _buttons[i].style.backgroundColor = Color.clear;
+                }
             }
-            _buttons[index].style.backgroundColor = new Color(0, 0.7f, 0, 1);
-            CurrentTab = index;
+            _buttons[CurrentTab].style.backgroundColor = _selectedColor;
         }
+
     }
 }

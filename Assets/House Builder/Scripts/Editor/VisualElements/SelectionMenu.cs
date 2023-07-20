@@ -18,6 +18,8 @@ namespace HouseBuilder.Editor
 
         private Func<T, string> GetName;
 
+        public T Current => _current;
+
         public SelectionMenu()
         {
             var button = new Button();

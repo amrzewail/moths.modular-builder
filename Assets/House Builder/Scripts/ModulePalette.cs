@@ -8,8 +8,12 @@ namespace HouseBuilder
     [CreateAssetMenu(menuName = "HouseBuilder/Module Palette")]
     public class ModulePalette : ScriptableObject
     {
-        [field: SerializeField] public ModuleType Type { get; private set; }
+        [SerializeField] string _type;
+        [SerializeField] GameObject[] _prefabs;
 
-        [field: SerializeField] public GameObject[] Prefabs { get; private set; }
+        public string Type => _type;
+
+        public GameObject[] Prefabs => _prefabs;
+
     }
 }

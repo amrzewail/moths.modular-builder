@@ -13,7 +13,7 @@ namespace HouseBuilder.Editor.Views
         private readonly IEditor _editor;
 
         private SelectionMenu<PaletteSet> _paletteSetSelection;
-        private EnumField _enumModuleTypes;
+        private SelectionMenu<string> _moduleTypeSelection;
         private Label _transformLabel;
         private GridVisualElement _grid;
 
@@ -33,13 +33,13 @@ namespace HouseBuilder.Editor.Views
             _paletteSetSelection.onSelected += PaletteSetSelectCallback;
             _paletteSetSelection.isItemDisabled += (paletteSet) => paletteSet.Palettes.Length == 0;
 
-            _enumModuleTypes = new EnumField("Module Type", ModuleType.Wall);
-            _enumModuleTypes.RegisterCallback<ChangeEvent<Enum>>(ModuleChangeCallback);
+            _moduleTypeSelection = new SelectionMenu<string>();
+            _moduleTypeSelection.onSelected += ModuleChangeCallback;
 
             _transformLabel = new Label();
 
             this.Add(_paletteSetSelection);
-            this.Add(_enumModuleTypes);
+            this.Add(_moduleTypeSelection);
             this.Add(_transformLabel);
 
             var raiseButton = new Button();
@@ -61,9 +61,26 @@ namespace HouseBuilder.Editor.Views
             {
                 _paletteSetSelection.Refresh(_editor.Palettes.PaletteSets, x => x.name);
                 _paletteSetSelection.Select(_editor.Palettes.PaletteSet);
+
+                UpdateModuleTypeList();
+                
             }
-            _editor.Palettes.ModuleType = (ModuleType)_enumModuleTypes.value;
-            UpdateModulesGrid();
+        }
+
+        private void UpdateModuleTypeList()
+        {
+            var types = ModuleTypeUtility.GetTypes(_editor.Palettes.PaletteSet);
+            if (types.Count > 0)
+            {
+                _moduleTypeSelection.Refresh(types.ToArray(), x => x);
+                _moduleTypeSelection.Select(types[0]);
+            }
+            else
+            {
+                _moduleTypeSelection.Refresh(new string[] { "None" }, x => x);
+                _moduleTypeSelection.Select("None");
+            }
+            ModuleChangeCallback(_moduleTypeSelection.Current);
         }
 
         private bool PaletteSetSelectCallback(PaletteSet set)
@@ -71,7 +88,7 @@ namespace HouseBuilder.Editor.Views
             _editor.Palettes.PaletteSet = set;
             _editor.Logger.Log(nameof(PlacementView), $"Changed palette set to {set.name}");
 
-            _enumModuleTypes.value = _editor.Palettes.ModuleType;
+            UpdateModuleTypeList();
             UpdateModulesGrid();
             return true;
         }
@@ -81,12 +98,13 @@ namespace HouseBuilder.Editor.Views
             _editor.SceneEditor.ExtrudeHeight();
         }
 
-        private void ModuleChangeCallback(ChangeEvent<Enum> evt)
+        private bool ModuleChangeCallback(string type)
         {
-            ModuleType type = (ModuleType)evt.newValue;
             _editor.Logger.Log(nameof(PlacementView), $"Changed module type to {type}.");
             _editor.Palettes.ModuleType = type;
             UpdateModulesGrid();
+
+            return true;
         }
 
         private void UpdateModulesGrid()

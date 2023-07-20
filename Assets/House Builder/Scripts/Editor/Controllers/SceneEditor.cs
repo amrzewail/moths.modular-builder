@@ -142,7 +142,7 @@ namespace HouseBuilder.Editor.Controllers
 
             }
 
-            _editor.Logger.Log(nameof(SceneEditor), "Attempted raise height.");
+            _editor.Logger.Log(nameof(SceneEditor), "Attempted extrude height.");
         }
 
         public void OnSceneGUI(SceneView view)
@@ -226,11 +226,12 @@ namespace HouseBuilder.Editor.Controllers
                     break;
 
                 case KeyCommand.Rotate:
-                    _previewExtraEulerAngles.y = (_previewExtraEulerAngles.y + 90 * _editor.Input.ScrollWheel) % 360;
-                    _editor.Previewer.eulerAngles = (gridRotation * _editor.Previewer.Prefab.transform.rotation).eulerAngles + _previewExtraEulerAngles;
-
-                    _editor.Logger.Log(nameof(SceneEditor), $"Rotate module prefab {_previewExtraEulerAngles}.");
-
+                    if (_editor.Previewer.Prefab)
+                    {
+                        _previewExtraEulerAngles.y = (_previewExtraEulerAngles.y + 90 * _editor.Input.ScrollWheel) % 360;
+                        _editor.Previewer.eulerAngles = (gridRotation * _editor.Previewer.Prefab.transform.rotation).eulerAngles + _previewExtraEulerAngles;
+                        _editor.Logger.Log(nameof(SceneEditor), $"Rotate module prefab {_previewExtraEulerAngles}.");
+                    }
                     break;
 
                 case KeyCommand.ChangeHeight:

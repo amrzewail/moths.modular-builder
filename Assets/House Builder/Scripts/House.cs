@@ -45,7 +45,7 @@ namespace HouseBuilder
             }
         }
 
-        public void Add(ModuleType type, int level, GameObject module)
+        public void Add(string type, int level, GameObject module)
         {
             CheckUpdateModulesList();
 
@@ -56,10 +56,10 @@ namespace HouseBuilder
                 levelChild.SetParent(transform);
                 levelChild.localPosition = Vector3.zero;
             }
-            Transform child = levelChild.Find(type.ToString());
+            Transform child = levelChild.Find(type);
             if (child == null)
             {
-                child = new GameObject(type.ToString()).transform;
+                child = new GameObject(type).transform;
                 child.SetParent(levelChild);
                 child.localPosition = Vector3.zero;
             }
@@ -107,13 +107,13 @@ namespace HouseBuilder
             return _queryResult;
         }
 
-        public List<GameObject> GetAtPosition(ModuleType type, int level, Vector3 worldPosition, float precision)
+        public List<GameObject> GetAtPosition(string type, int level, Vector3 worldPosition, float precision)
         {
             Transform levelChild = transform.Find($"Level{level}");
             _queryResult.Clear();
             if (levelChild)
             {
-                Transform child = levelChild.Find(type.ToString());
+                Transform child = levelChild.Find(type);
                 if (child)
                 {
                     for (int i = 0; i < child.childCount; i++)
@@ -149,13 +149,13 @@ namespace HouseBuilder
             }
         }
 
-        public List<GameObject> GetAllAtHeight(ModuleType type, int level, int heightIndex)
+        public List<GameObject> GetAllAtHeight(string type, int level, int heightIndex)
         {
             Transform levelChild = transform.Find($"Level{level}");
             List<GameObject> list = new List<GameObject>();
             if (levelChild)
             {
-                Transform child = levelChild.Find(type.ToString());
+                Transform child = levelChild.Find(type);
                 if (child)
                 {
                     for (int i = 0; i < child.childCount; i++)

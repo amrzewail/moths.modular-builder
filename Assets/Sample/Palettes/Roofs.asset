@@ -12,11 +12,11 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 97dd6ad12300bef4890188b3c1c77de1, type: 3}
   m_Name: Roofs
   m_EditorClassIdentifier: 
-  <Type>k__BackingField: 30
-  <Prefabs>k__BackingField:
-  - {fileID: 4906261723514147603, guid: 68c0a10dde5086146b1dde8931337c18, type: 3}
+  _type: Roof
+  _prefabs:
   - {fileID: 8687313323495091498, guid: 0b405550764ffdd44a08914910c2155c, type: 3}
   - {fileID: 1332183670250073317, guid: 35fe9c0a316b21d46a3577ae4275321a, type: 3}
   - {fileID: 8230715906394833187, guid: 6c0da139c09760f498e09db273aa6a0a, type: 3}
   - {fileID: 8772912874493110616, guid: 9e970702ef5652542b54f8b950ed1762, type: 3}
   - {fileID: 5264665008849773688, guid: 1568bf9427dcde5468df42e854d9afb8, type: 3}
+  - {fileID: 4906261723514147603, guid: 68c0a10dde5086146b1dde8931337c18, type: 3}

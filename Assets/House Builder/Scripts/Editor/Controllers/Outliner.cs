@@ -81,7 +81,8 @@ namespace HouseBuilder.Editor.Controllers
 			Material mat = new Material(_outlineMaterial);
 			mat.SetColor("_Color", color);
             _outlinedObjects[go] = new Outline(go.GetComponentsInChildren<MeshFilter>(), mat);
-			_editor.Logger.Log(nameof(Outliner), $"Outline object {go.name}");
+			
+			//_editor.Logger.Log(nameof(Outliner), $"Outline object {go.name}");
 		}
 
 		public void RemoveGameObject(GameObject go)
@@ -89,7 +90,8 @@ namespace HouseBuilder.Editor.Controllers
 			if (!go) return;
 			if (!_outlinedObjects.ContainsKey(go)) return;
             _outlinedObjects.Remove(go);
-			_editor.Logger.Log(nameof(Outliner), $"Remove outline object {go.name}");
+			
+			//_editor.Logger.Log(nameof(Outliner), $"Remove outline object {go.name}");
 		}
 
 		public void RemoveAll()

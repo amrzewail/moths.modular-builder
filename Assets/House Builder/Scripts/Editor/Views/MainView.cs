@@ -20,12 +20,13 @@ namespace HouseBuilder.Editor.Views
         private ButtonTabs _tabs;
 
 
-        private ButtonTabs _levelTabs;
         private ButtonTabs _heightTabs;
         private Toggle _showAllLevels;
 
         private VisualElement _newHouseView;
         private PlacementView _placementView;
+
+        private int _lastHouseMaxHeightCount = 0;
 
         public MainView(IEditor editor)
         {
@@ -41,18 +42,24 @@ namespace HouseBuilder.Editor.Views
             this.Add(_body);
 
 
-            _levelTabs = new ButtonTabs("0", "1", "2", "3", "4", "5", "6", "7", "8", "9");
-            _levelTabs.label.text = "Level";
-            _levelTabs.onTabClicked += LevelTabClickCallback;
+            //_levelTabs = new ButtonTabs("0", "1", "2", "3", "4", "5", "6", "7", "8", "9");
+            //_levelTabs.label.text = "Level";
+            //_levelTabs.onTabClicked += LevelTabClickCallback;
 
             _heightTabs = new ButtonTabs();
+            for(int i = 0; i < 31; i++)
+            {
+                _heightTabs.AddTab($"{i}");
+            }
+
             _heightTabs.label.text = "Height";
             _heightTabs.onTabClicked += HeightTabClickCallback;
+            _heightTabs.tabsStyle.flexWrap = Wrap.Wrap;
 
             _showAllLevels = new Toggle("Show all levels");
             _showAllLevels.RegisterCallback<ChangeEvent<bool>>(ShowAllLevelsToggle);
 
-            _header.Add(_levelTabs);
+            //_header.Add(_levelTabs);
             _header.Add(_heightTabs);
             _header.Add(_showAllLevels);
 
@@ -89,7 +96,8 @@ namespace HouseBuilder.Editor.Views
 
         private void HeightTabClickCallback(int index, string arg2)
         {
-            _editor.Grid.CurrentHeightIndex = index;
+            _editor.Grid.totalHeightIndex = index;
+            UpdateHouseVisibility();
             SceneView.RepaintAll();
         }
 
@@ -152,33 +160,32 @@ namespace HouseBuilder.Editor.Views
         {
             if (_editor.IsHouseValid)
             {
-                if (_heightTabs != null)
+                if (_heightTabs != null && _lastHouseMaxHeightCount != _editor.House.levelGridHeight)
                 {
-                    int maxHeightValue = _editor.Grid.LevelHeightCount;
-                    if (maxHeightValue != _heightTabs.TabsCount)
+                    _heightTabs.ClearBackgroundColorOverrides();
+                    for (int i = 0; i < _heightTabs.TabsCount; i++)
                     {
-                        _heightTabs.ClearTabs();
-                        for (int i = 0; i < maxHeightValue; i++)
-                        {
-                            _heightTabs.AddTab($"{i}");
-                        }
+                        if (i % _editor.House.levelGridHeight == 0) _heightTabs.OverrideTabBackgroundColor(i, Color.red);
                     }
+                    _heightTabs.UpdateTabBackgroundColors();
+                    _lastHouseMaxHeightCount = _editor.House.levelGridHeight;
                 }
             }
 
             if (_editor.Grid.CurrentHeightIndex != _heightTabs.CurrentTab)
             {
-                _heightTabs.ClickNoCallback(_editor.Grid.CurrentHeightIndex);
+                _heightTabs.ClickNoCallback(_editor.Grid.totalHeightIndex);
+                UpdateHouseVisibility();
             }
 
-            if (_editor.Grid.CurrentLevelIndex != _levelTabs.CurrentTab)
-            {
-                if (_levelTabs.TabsCount > _editor.Grid.CurrentLevelIndex)
-                {
-                    UpdateHouseVisibility();
-                    _levelTabs.ClickNoCallback(_editor.Grid.CurrentLevelIndex);
-                }
-            }
+            //if (_editor.Grid.CurrentLevelIndex != _levelTabs.CurrentTab)
+            //{
+            //    if (_levelTabs.TabsCount > _editor.Grid.CurrentLevelIndex)
+            //    {
+            //        UpdateHouseVisibility();
+            //        _levelTabs.ClickNoCallback(_editor.Grid.CurrentLevelIndex);
+            //    }
+            //}
         }
 
 

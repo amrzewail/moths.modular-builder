@@ -11,7 +11,7 @@ namespace HouseBuilder.Editor.Controllers
         PaletteSet[] PaletteSets { get; }
         PaletteSet PaletteSet { get; set; }
 
-        ModuleType ModuleType { get; set; }
+        string ModuleType { get; set; }
 
         ModulePalette Palette { get; }
 

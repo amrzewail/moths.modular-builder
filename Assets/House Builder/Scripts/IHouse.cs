@@ -16,16 +16,16 @@ namespace HouseBuilder
 
         int levelGridHeight { get; }
 
-        void Add(ModuleType type, int level, GameObject module);
+        void Add(string type, int level, GameObject module);
 
         GameObject GetFirstByQuery(Func<GameObject, bool> query);
         List<GameObject> GetByQuery(Func<GameObject, bool> query);
-        List<GameObject> GetAtPosition(ModuleType type, int level, Vector3 worldPosition, float precision);
+        List<GameObject> GetAtPosition(string type, int level, Vector3 worldPosition, float precision);
 
         void HideLevelRange(int minInclusive, int maxExlusive);
 
         void ShowAllLevels();
 
-        List<GameObject> GetAllAtHeight(ModuleType type, int level, int heightIndex);
+        List<GameObject> GetAllAtHeight(string type, int level, int heightIndex);
     }
 }

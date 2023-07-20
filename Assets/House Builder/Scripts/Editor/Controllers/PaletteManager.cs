@@ -6,7 +6,7 @@ namespace HouseBuilder.Editor.Controllers
 {
     public class PaletteManager : IPaletteManager
     {
-        private ModuleType _currentModuleType;
+        private string _currentModuleType;
         private PaletteSet _currentPaletteSet;
         private ILogger _logger;
 
@@ -21,7 +21,7 @@ namespace HouseBuilder.Editor.Controllers
             set
             {
                 _currentPaletteSet = value;
-                ModuleType = ModuleType.None;
+                ModuleType = "";
                 if (!PaletteSet) return;
                 if (PaletteSet.Palettes.Length > 0)
                 {
@@ -33,7 +33,7 @@ namespace HouseBuilder.Editor.Controllers
                 }
             }
         }
-        public ModuleType ModuleType
+        public string ModuleType
         {
             get => _currentModuleType;
             set

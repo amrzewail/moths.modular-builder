@@ -6,6 +6,6 @@ namespace HouseBuilder
 {
     public class HouseModule : MonoBehaviour
     {
-        [field: SerializeField] public ModuleType Type { get; private set; }
+        //[field: SerializeField] public string Type { get; private set; }
     }
 }
