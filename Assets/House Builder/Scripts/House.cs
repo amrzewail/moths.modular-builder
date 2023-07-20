@@ -1,3 +1,4 @@
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
@@ -7,6 +8,7 @@ namespace HouseBuilder
     public class House : MonoBehaviour, IHouse
     {
         private List<GameObject> _queryResult = new List<GameObject>();
+        private List<GameObject> _allModuless = new List<GameObject>();
 
         public bool hasReference => this;
         public Vector3 origin => transform.position;
@@ -24,8 +26,29 @@ namespace HouseBuilder
             _levelGridHeight = Mathf.Max(1, _levelGridHeight);
         }
 
+        private void CheckUpdateModulesList()
+        {
+            if (_allModuless.Count == 0)
+            {
+                for (int i = 0; i < transform.childCount; i++)
+                {
+                    Transform level = transform.GetChild(i);
+                    for(int j = 0; j < level.childCount; j++)
+                    {
+                        Transform moduleType = level.GetChild(j);
+                        for (int k = 0; k < moduleType.childCount; k++)
+                        {
+                            _allModuless.Add(moduleType.GetChild(k).gameObject);
+                        }
+                    }
+                }
+            }
+        }
+
         public void Add(ModuleType type, int level, GameObject module)
         {
+            CheckUpdateModulesList();
+
             Transform levelChild = transform.Find($"Level{level}");
             if (!levelChild)
             {
@@ -41,6 +64,47 @@ namespace HouseBuilder
                 child.localPosition = Vector3.zero;
             }
             module.transform.SetParent(child, true);
+
+            _allModuless.Add(module);
+        }
+
+        public GameObject GetFirstByQuery(Func<GameObject, bool> query)
+        {
+            CheckUpdateModulesList();
+            for (int i = 0; i < _allModuless.Count; i++)
+            {
+                if (!_allModuless[i])
+                {
+                    _allModuless.RemoveAt(i);
+                    i--;
+                    continue;
+                }
+                if (query(_allModuless[i].gameObject))
+                {
+                    return _allModuless[i].gameObject;
+                }
+            }
+            return null;
+        }
+
+        public List<GameObject> GetByQuery(Func<GameObject, bool> query)
+        {
+            CheckUpdateModulesList();
+            _queryResult.Clear();
+            for(int i = 0; i < _allModuless.Count; i++)
+            {
+                if (!_allModuless[i])
+                {
+                    _allModuless.RemoveAt(i);
+                    i--;
+                    continue;
+                }
+                if (query(_allModuless[i].gameObject))
+                {
+                    _queryResult.Add(_allModuless[i].gameObject);
+                }
+            }
+            return _queryResult;
         }
 
         public List<GameObject> GetAtPosition(ModuleType type, int level, Vector3 worldPosition, float precision)

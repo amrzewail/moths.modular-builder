@@ -8,16 +8,18 @@ namespace HouseBuilder.Editor.Controllers
     public class SceneEditor : ISceneEditor
     {
         private readonly IEditor _editor;
+        private readonly IOutliner _alignedOutliner;
 
         private Vector3 _previewExtraEulerAngles;
-        private GameObject _lastDeletingTarget;
 
-        private readonly Color _deleteColor = new Color(0.5f, 0, 0, 0.75f);
-        private readonly Color _selectedColor = new Color(0, 0, 0.5f, 0.75f);
+        private readonly Color _yAxisAlignColor = new Color(0, 0.75f, 0, 0.8f);
+
+        private List<GameObject> _highlightedObjectsAligned = new List<GameObject>();
 
         public SceneEditor(IEditor editor)
         {
             _editor = editor;
+            _alignedOutliner = new Outliner(editor);
         }
 
         private bool CheckForDuplication(Vector3 position, Vector3 eulerAngles, GameObject prefab)
@@ -74,6 +76,40 @@ namespace HouseBuilder.Editor.Controllers
             return module;
         }
 
+        private void RenderPreviewPivot()
+        {
+            Handles.zTest = UnityEngine.Rendering.CompareFunction.Always;
+
+            Matrix4x4 TRS = Matrix4x4.TRS(_editor.Previewer.position, _editor.Grid.rotation * Quaternion.Euler(_previewExtraEulerAngles), Vector3.one);
+            Handles.matrix = TRS;
+
+            Handles.color = Color.blue;
+            Handles.DrawLine(Vector3.zero, Vector3.forward);
+
+            Handles.color = Color.red;
+            Handles.DrawLine(Vector3.zero, Vector3.right);
+
+            Handles.color = Color.green;
+            Handles.DrawLine(Vector3.zero, Vector3.down * _editor.Grid.totalHeightIndex * _editor.Grid.gridSize.y);
+
+            Handles.matrix = Matrix4x4.identity;
+        }
+
+        private void HighlightAlignedModules()
+        {
+            Vector2 previewPosition = new Vector2(_editor.Previewer.position.x, _editor.Previewer.position.z);
+            float precision = _editor.Grid.gridSize.magnitude / 4;
+            List<GameObject> alignedYAxis = _editor.House.GetByQuery(g =>
+            {
+                return g.transform.position.y < _editor.Previewer.position.y - _editor.Grid.gridSize.y - precision && Vector2.Distance(new Vector2(g.transform.position.x, g.transform.position.z), previewPosition) < precision;
+            });
+
+            for(int i = 0; i < alignedYAxis.Count; i++)
+            {
+                _alignedOutliner.AddGameObject(alignedYAxis[i], _yAxisAlignColor);
+            }
+        }
+
         public void RaiseHeight()
         {
             var gameObjects = _editor.House.GetAllAtHeight(_editor.Palettes.ModuleType, _editor.Grid.CurrentLevelIndex, _editor.Grid.CurrentHeightIndex);
@@ -100,6 +136,8 @@ namespace HouseBuilder.Editor.Controllers
 
         public void OnSceneGUI(SceneView view)
         {
+            _alignedOutliner.Cleanup();
+
             if (_editor.IsHouseValid == false) return;
 
             Vector3 position = BuilderEditorUtility.MouseToWorldPosition(view, _editor.Grid.Center);
@@ -116,18 +154,14 @@ namespace HouseBuilder.Editor.Controllers
                     Handles.color = Color.green;
                     Handles.DrawWireDisc(position, Vector3.up, _editor.Grid.gridSize.magnitude / 4);
 
-                    if (_lastDeletingTarget)
-                    {
-                        _editor.Outliner.RemoveGameObject(_lastDeletingTarget);
-                        _lastDeletingTarget = null;
-                    }
-
                     if (_editor.Previewer.Prefab)
                     {
-                        _editor.Outliner.RemoveAll();
                         _editor.Previewer.Show();
                         _editor.Previewer.position = position;
                         _editor.Previewer.eulerAngles = (gridRotation * _editor.Previewer.Prefab.transform.rotation).eulerAngles + _previewExtraEulerAngles;
+
+                        RenderPreviewPivot();
+                        HighlightAlignedModules();
                     }
 
                     view.Repaint();
@@ -144,30 +178,14 @@ namespace HouseBuilder.Editor.Controllers
                     {
                         if (!CheckForDuplication(_editor.Previewer.position, _editor.Previewer.eulerAngles, _editor.Previewer.Prefab))
                         {
+                            _editor.Selector.Clear();
                             GameObject module = InstantiatePreviewPrefab();
                         }
                     }
                     break;
 
-                case KeyCommand.PrepareDelete:
-                    Handles.zTest = UnityEngine.Rendering.CompareFunction.Less;
-                    Handles.color = Color.red;
-                    Handles.DrawWireDisc(position, Vector3.up, _editor.Grid.gridSize.magnitude / 4);
+                case KeyCommand.PrepareHighlight:
                     _editor.Previewer.Hide();
-                    _editor.Selector.Clear();
-
-                    List<GameObject> deletingTargets = _editor.House.GetAtPosition(_editor.Palettes.ModuleType, _editor.Grid.CurrentLevelIndex, position, _editor.Grid.gridSize.magnitude / 4f);
-                    GameObject deletingTarget = deletingTargets.Count > 0 ? deletingTargets[0] : null;
-                    if (_lastDeletingTarget && _lastDeletingTarget != deletingTarget)
-                    {
-                        _editor.Outliner.RemoveGameObject(_lastDeletingTarget);
-                    }
-                    _editor.Outliner.AddGameObject(deletingTarget, _deleteColor);
-
-
-                    _lastDeletingTarget = deletingTarget;
-
-                    view.Repaint();
                     break;
 
                 case KeyCommand.Delete:

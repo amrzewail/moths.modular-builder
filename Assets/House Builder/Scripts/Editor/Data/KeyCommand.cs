@@ -8,7 +8,7 @@ namespace HouseBuilder.Editor
     {
         None,
         LeftMouseButtonUp,
-        PrepareDelete,
+        PrepareHighlight,
         Delete,
         Rotate,
         Flip,

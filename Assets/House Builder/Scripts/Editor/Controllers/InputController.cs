@@ -71,42 +71,49 @@ namespace HouseBuilder.Editor.Controllers
                 return;
             }
 
-            if (Event.current.shift && !Event.current.alt && !Event.current.control)
-            {
-                Command = KeyCommand.PrepareDelete;
+            //if (Event.current.control && !Event.current.alt && !Event.current.control)
+            //{
+            //    Command = KeyCommand.PrepareDelete;
 
-                if (Event.current.type == EventType.MouseUp || Event.current.type == EventType.MouseDrag)
+            //    if (Event.current.type == EventType.MouseUp || Event.current.type == EventType.MouseDrag)
+            //    {
+            //        if (Event.current.button == 0)
+            //        {
+            //            Command = KeyCommand.Delete;
+            //        }
+            //    }
+
+
+            //    return;
+            //}
+
+            if (Event.current.control && !Event.current.alt)
+            {
+                if (Event.current.button == 0)
                 {
-                    if (Event.current.button == 0)
+                    if (Event.current.type == EventType.MouseDown)
                     {
-                        Command = KeyCommand.Delete;
+                        _isLeftClickHighlightDown = true;
+                    }
+
+                    if (_isLeftClickHighlightDown)
+                    {
+                        if (Event.current.type == EventType.MouseUp)
+                        {
+                            Command = KeyCommand.HighlightClick;
+                            return;
+                        }
+                        else if (Event.current.type == EventType.MouseDrag)
+                        {
+                            Command = KeyCommand.HighlightDrag;
+                            return;
+                        }
                     }
                 }
 
 
+                Command = KeyCommand.PrepareHighlight;
                 return;
-            }
-
-            if (Event.current.control && !Event.current.alt && Event.current.button == 0)
-            {
-                if (Event.current.type == EventType.MouseDown)
-                {
-                    _isLeftClickHighlightDown = true;
-                }
-
-                if (_isLeftClickHighlightDown)
-                {
-                    if (Event.current.type == EventType.MouseUp)
-                    {
-                        Command = KeyCommand.HighlightClick;
-                        return;
-                    }
-                    else if (Event.current.type == EventType.MouseDrag)
-                    {
-                        Command = KeyCommand.HighlightDrag;
-                        return;
-                    }
-                }
             }
 
             if (Event.current.alt == false && Event.current.control == false)

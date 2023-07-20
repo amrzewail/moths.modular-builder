@@ -8,7 +8,10 @@ namespace HouseBuilder.Editor.Controllers
 {
     public class ModuleObjectSelector : ISelector
     {
+        public bool isEnabled { get; set; } = true;
         public Color? overrideColor { get; set; } = null;
+
+        public Func<GameObject, bool> CanSelect { get; set; }
 
         public GameObject Current => CurrentMultiple.Count > 0 ? CurrentMultiple[0] : null;
 
@@ -30,8 +33,24 @@ namespace HouseBuilder.Editor.Controllers
             CurrentMultiple = new List<GameObject>();
         }
 
+
+        private bool CanSelectObject(GameObject g)
+        {
+            if (!g) return false;
+            bool isInHouse = _editor.House.GetFirstByQuery(x => g == x);
+            if (CanSelect != null)
+            {
+                return CanSelect(g) && isInHouse;
+            }
+            return isInHouse;
+        }
+
+
         private void Select(GameObject g)
         {
+            if (!isEnabled) return;
+            if (!_editor.IsHouseValid) return;
+
             if (CurrentMultiple.Contains(g)) return;
             _editor.Outliner.AddGameObject(g, selectionColor);
             CurrentMultiple.Add(g);
@@ -83,8 +102,11 @@ namespace HouseBuilder.Editor.Controllers
                     {
                         if (!CurrentMultiple.Contains(selectedGameObject))
                         {
-                            Select(selectedGameObject);
-                            _lastSelectedGameObject = selectedGameObject;
+                            if (CanSelectObject(selectedGameObject))
+                            {
+                                Select(selectedGameObject);
+                                _lastSelectedGameObject = selectedGameObject;
+                            }
                         }
                         else if (_lastSelectedGameObject != selectedGameObject)
                         {
@@ -100,13 +122,19 @@ namespace HouseBuilder.Editor.Controllers
                 case KeyCommand.HighlightClick:
 
                     selectedGameObject = HandleUtility.PickGameObject(_editor.Input.MousePosition, true);
+                    bool canSelect = CanSelectObject(selectedGameObject);
+                    if (!selectedGameObject || !canSelect)
+                    {
+                        Clear();
+                        break;
+                    }
                     if (selectedGameObject && _mouseDownObject == selectedGameObject)
                     {
                         if (CurrentMultiple.Contains(selectedGameObject))
                         {
                             Unselect(selectedGameObject);
                         }
-                        else
+                        else if (canSelect)
                         {
                             Select(selectedGameObject);
                         }
@@ -114,22 +142,7 @@ namespace HouseBuilder.Editor.Controllers
 
                     break;
 
-
-                case KeyCommand.LeftMouseButtonUp:
-
-                    selectedGameObject = HandleUtility.PickGameObject(_editor.Input.MousePosition, true);
-                    _editor.Outliner.RemoveAll();
-                    CurrentMultiple.Clear();
-
-                    if (selectedGameObject && _mouseDownObject == selectedGameObject && Current != selectedGameObject)
-                    {
-                        CurrentMultiple.Clear();
-                        Select(selectedGameObject);
-                    }
-
-                    break;
             }
-
         }
 
         public void Clear()

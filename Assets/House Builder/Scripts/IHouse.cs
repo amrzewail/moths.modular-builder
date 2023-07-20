@@ -1,3 +1,4 @@
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
@@ -17,6 +18,8 @@ namespace HouseBuilder
 
         void Add(ModuleType type, int level, GameObject module);
 
+        GameObject GetFirstByQuery(Func<GameObject, bool> query);
+        List<GameObject> GetByQuery(Func<GameObject, bool> query);
         List<GameObject> GetAtPosition(ModuleType type, int level, Vector3 worldPosition, float precision);
 
         void HideLevelRange(int minInclusive, int maxExlusive);
