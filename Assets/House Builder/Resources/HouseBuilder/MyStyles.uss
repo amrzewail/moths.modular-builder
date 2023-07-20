@@ -1,0 +1,149 @@
+:root
+{
+	--selected-color: #116D6E;
+	--level-color: #CD1818;
+	--hover-color: #116D6E;
+}
+
+/*BUTTON TABS*/
+
+ButtonTabs
+{
+	border-color: black;
+	/*border-bottom-width: 1px;*/
+	/*background-color: rgba(255, 255, 255, 0.2);*/
+	height: auto;
+}
+
+ButtonTabs .buttons-container 
+{
+	display:flex;
+	flex-direction: row;
+	justify-content: center;
+	flex-wrap: wrap;
+	padding: 5px 0;
+	min-height: 50px;
+	align-items: center;
+}
+
+ButtonTabs Label
+{
+	font-size: 15px;
+	-unity-font-style: bold;
+	-unity-text-align: upper-center;
+
+	margin-bottom: 5px;
+	border-style: solid;
+	padding: 4px;
+	width: 100px;
+	border-color: black;
+	border-bottom-width: 1px;
+}
+
+ButtonTabs .buttons-container Button
+{
+	transition: 0.15s;
+	padding: 3px;
+	display: flex;
+	border-radius: 10px;
+}
+
+ButtonTabs .buttons-container Button:focus
+{
+	border: 1px;
+	border-color: blue;
+}
+
+ButtonTabs .buttons-container Button.selected
+{
+	background-color: var(--selected-color);
+	border-color: var(--selected-color);
+	border-width: 2px;
+	padding: 5px;
+}
+
+
+ButtonTabs .buttons-container Button:hover
+{
+	color: black;
+}
+
+.edit-tabs .buttons-container
+{
+	display: flex;
+	padding: 0;
+}
+
+.edit-tabs .buttons-container Button
+{
+	flex: 1;
+	-unity-font-style: bold;
+	font-size: 17px;
+}
+
+/*END BUTTON TABS*/
+
+
+/*SHOW LEVELS TOGGLE*/
+
+
+.show-levels
+{
+	/*background-color: rgba(255, 255, 255, 0.2);*/
+	padding: 4px;
+	border-width: none;
+}
+
+
+/*END SHOW LEVELS TOGGLE*/
+
+
+/*HEIGHT TABS*/
+
+.height-tabs-container
+{
+}
+
+.height-tabs-container .buttons-container Button
+{
+	border-radius: 50%;
+	width: 25px;
+	height: 25px;
+}
+
+
+/*END HEIGHT TABS*/
+
+.prefabs-tabs .prefab-replace-btn
+{
+	transition-duration: 0.15s;
+	transition-property: translate;
+	translate: 0px 135px;
+	transition-timing-function: ease-out;
+}
+
+.prefabs-tabs .tab:hover .prefab-replace-btn
+{
+	translate: 0px 80px;
+}
+
+.prefabs-tabs .tabs .tab
+{
+	width: 200px;
+	height: 100px;
+	overflow: hidden;
+}
+
+
+.prefabs-tabs .tabs 
+{
+	flex-direction: row;
+	flex-wrap: wrap;
+}
+
+.prefabs-tabs .tabs .selected
+{
+	background-color: var(--selected-color);
+	border-color: var(--selected-color);
+	border-width: 2px;
+}
