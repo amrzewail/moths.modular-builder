@@ -1,5 +1,6 @@
 using System.Collections;
 using System.Collections.Generic;
+using System.Linq;
 using UnityEditor;
 using UnityEngine;
 
@@ -110,17 +111,25 @@ namespace HouseBuilder.Editor.Controllers
             }
         }
 
-        public void RaiseHeight()
+        public void ExtrudeHeight()
         {
-            var gameObjects = _editor.House.GetAllAtHeight(_editor.Palettes.ModuleType, _editor.Grid.CurrentLevelIndex, _editor.Grid.CurrentHeightIndex);
+            List<GameObject> gameObjects = null;
+            if (_editor.Selector.CurrentMultiple.Count > 0)
+            {
+                gameObjects = _editor.Selector.CurrentMultiple.ToList();
+            }
+            else
+            {
+                gameObjects = _editor.House.GetAllAtHeight(_editor.Palettes.ModuleType, _editor.Grid.CurrentLevelIndex, _editor.Grid.CurrentHeightIndex);
+                _editor.Grid.totalHeightIndex++;
+            }
 
-            _editor.Grid.totalHeightIndex++;
-
+            _editor.Selector.Clear();
             foreach (GameObject g in gameObjects)
             {
                 GameObject prefab = PrefabUtility.GetCorrespondingObjectFromSource(g);
                 Vector3 position = g.transform.position;
-                position.y = _editor.Grid.Center.y;
+                position.y += _editor.Grid.gridSize.y;
 
                 if (CheckForDuplication(position, g.transform.eulerAngles, prefab)) continue;
 
@@ -128,6 +137,8 @@ namespace HouseBuilder.Editor.Controllers
                 prefab.transform.position = position;
                 prefab.transform.rotation = g.transform.rotation;
                 prefab.transform.localScale = g.transform.localScale;
+
+                _editor.Selector.Select(prefab);
 
             }
 

@@ -8,7 +8,7 @@ namespace HouseBuilder
     public class House : MonoBehaviour, IHouse
     {
         private List<GameObject> _queryResult = new List<GameObject>();
-        private List<GameObject> _allModuless = new List<GameObject>();
+        private List<GameObject> _allModules = new List<GameObject>();
 
         public bool hasReference => this;
         public Vector3 origin => transform.position;
@@ -28,7 +28,7 @@ namespace HouseBuilder
 
         private void CheckUpdateModulesList()
         {
-            if (_allModuless.Count == 0)
+            if (_allModules.Count == 0)
             {
                 for (int i = 0; i < transform.childCount; i++)
                 {
@@ -38,7 +38,7 @@ namespace HouseBuilder
                         Transform moduleType = level.GetChild(j);
                         for (int k = 0; k < moduleType.childCount; k++)
                         {
-                            _allModuless.Add(moduleType.GetChild(k).gameObject);
+                            _allModules.Add(moduleType.GetChild(k).gameObject);
                         }
                     }
                 }
@@ -65,23 +65,23 @@ namespace HouseBuilder
             }
             module.transform.SetParent(child, true);
 
-            _allModuless.Add(module);
+            _allModules.Add(module);
         }
 
         public GameObject GetFirstByQuery(Func<GameObject, bool> query)
         {
             CheckUpdateModulesList();
-            for (int i = 0; i < _allModuless.Count; i++)
+            for (int i = 0; i < _allModules.Count; i++)
             {
-                if (!_allModuless[i])
+                if (!_allModules[i])
                 {
-                    _allModuless.RemoveAt(i);
+                    _allModules.RemoveAt(i);
                     i--;
                     continue;
                 }
-                if (query(_allModuless[i].gameObject))
+                if (query(_allModules[i].gameObject))
                 {
-                    return _allModuless[i].gameObject;
+                    return _allModules[i].gameObject;
                 }
             }
             return null;
@@ -91,17 +91,17 @@ namespace HouseBuilder
         {
             CheckUpdateModulesList();
             _queryResult.Clear();
-            for(int i = 0; i < _allModuless.Count; i++)
+            for(int i = 0; i < _allModules.Count; i++)
             {
-                if (!_allModuless[i])
+                if (!_allModules[i])
                 {
-                    _allModuless.RemoveAt(i);
+                    _allModules.RemoveAt(i);
                     i--;
                     continue;
                 }
-                if (query(_allModuless[i].gameObject))
+                if (query(_allModules[i].gameObject))
                 {
-                    _queryResult.Add(_allModuless[i].gameObject);
+                    _queryResult.Add(_allModules[i].gameObject);
                 }
             }
             return _queryResult;

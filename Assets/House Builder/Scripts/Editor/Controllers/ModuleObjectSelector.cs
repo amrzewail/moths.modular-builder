@@ -46,7 +46,7 @@ namespace HouseBuilder.Editor.Controllers
         }
 
 
-        private void Select(GameObject g)
+        public void Select(GameObject g)
         {
             if (!isEnabled) return;
             if (!_editor.IsHouseValid) return;

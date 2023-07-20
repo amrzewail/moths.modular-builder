@@ -9,6 +9,6 @@ namespace HouseBuilder.Editor.Controllers
     {
         void OnSceneGUI(SceneView view);
 
-        void RaiseHeight();
+        void ExtrudeHeight();
     }
 }

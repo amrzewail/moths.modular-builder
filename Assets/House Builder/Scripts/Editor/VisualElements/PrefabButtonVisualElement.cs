@@ -26,6 +26,11 @@ namespace HouseBuilder.Editor
             Label label = new Label(prefab.name);
             this.Add(label);
 
+            this.Add(new Button()
+            {
+                text = "Replace",
+            });
+
             base.clicked += ClickCallback;
 
             RefreshPreview();

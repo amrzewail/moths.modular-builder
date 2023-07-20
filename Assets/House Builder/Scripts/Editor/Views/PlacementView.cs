@@ -43,7 +43,7 @@ namespace HouseBuilder.Editor.Views
             this.Add(_transformLabel);
 
             var raiseButton = new Button();
-            raiseButton.text = "Raise";
+            raiseButton.text = "Extrude Up";
             raiseButton.clicked += RaiseCallback;
 
             this.Add(raiseButton);
@@ -78,7 +78,7 @@ namespace HouseBuilder.Editor.Views
 
         private void RaiseCallback()
         {
-            _editor.SceneEditor.RaiseHeight();
+            _editor.SceneEditor.ExtrudeHeight();
         }
 
         private void ModuleChangeCallback(ChangeEvent<Enum> evt)

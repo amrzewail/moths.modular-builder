@@ -17,6 +17,8 @@ namespace HouseBuilder.Editor.Controllers
 
         List<GameObject> CurrentMultiple { get; }
 
+        void Select(GameObject gameObject);
+
         void Clear();
 
     }
