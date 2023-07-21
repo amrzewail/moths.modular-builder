@@ -52,9 +52,10 @@ namespace HouseBuilder.Editor.Views
 
         private void NewPaletteSetCallback()
         {
-            PaletteSet set = ScriptableObject.CreateInstance<PaletteSet>();
             string path = EditorUtility.SaveFilePanel("Save new palette set", "Assets", "Palette Set", "asset");
             if (string.IsNullOrEmpty(path)) return;
+
+            PaletteSet set = ScriptableObject.CreateInstance<PaletteSet>();
             path = FileUtil.GetProjectRelativePath(path);
             AssetDatabase.CreateAsset(set, path);
             AssetDatabase.SaveAssets();
@@ -133,6 +134,36 @@ namespace HouseBuilder.Editor.Views
                 modulePalette.deleted += ModulePaletteDeleteCallback;
                 modulePaletteList.Add(modulePalette);
             }
+
+            Button addPaletteBtn = new Button();
+            addPaletteBtn.text = "Add palette";
+            addPaletteBtn.AddToClassList("add-palette-btn");
+            addPaletteBtn.clicked += AddPaletteCallback;
+            modulePaletteList.Add(addPaletteBtn);
+        }
+
+        private void AddPaletteCallback()
+        {
+            string path = EditorUtility.SaveFilePanel("Select palette", "Assets", "New Palette", "asset");
+            if (string.IsNullOrEmpty(path)) return;
+            path = FileUtil.GetProjectRelativePath(path);
+            ModulePalette palette = null;
+            var list = _currentEditingSet.Palettes.ToList();
+            palette = AssetDatabase.LoadAssetAtPath<ModulePalette>(path);
+            if (!palette)
+            {
+                palette = ScriptableObject.CreateInstance<ModulePalette>();
+                AssetDatabase.CreateAsset(palette, path);
+                AssetDatabase.SaveAssets();
+            }
+            else
+            {
+                if (list.Contains(palette)) return;
+            }
+            list.Add(palette);
+            _currentEditingSet.SetPalettes(list.ToArray());
+            BuilderEditorUtility.SaveAssetChanges(_currentEditingSet);
+            Refresh();
         }
 
         private void ModulePaletteDeleteCallback(ModulePalette palette)

@@ -14,3 +14,4 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   <Palettes>k__BackingField:
   - {fileID: 11400000, guid: de35a4048a4fb964fa564005b963fd42, type: 2}
+  - {fileID: 11400000, guid: 1169e42b3062669449e2625979b82dd3, type: 2}

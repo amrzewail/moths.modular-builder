@@ -12,6 +12,7 @@ namespace HouseBuilder.Editor
     {
         private ModulePalette _palette;
         private SelectionMenu<string> _moduleType;
+        private VisualElement _headerAlignRight;
         private VisualElement _prefabsGrid;
 
         public event Action<ModulePalette> deleted;
@@ -30,15 +31,18 @@ namespace HouseBuilder.Editor
             _moduleType.onSelected += ModuleTypeChangeCallback;
             header.Add(_moduleType);
 
+            _headerAlignRight = new VisualElement();
+            _headerAlignRight.style.flexDirection = FlexDirection.Row;
+            header.Add(_headerAlignRight);
 
             var highlightBtn = new Button(HighlightPaletteCallback) { text = "Highlight" };
             highlightBtn.AddToClassList("highlight-btn");
-            header.Add(highlightBtn);
+            _headerAlignRight.Add(highlightBtn);
 
             var deleteBtn = new Button() { text = "X" };
             deleteBtn.AddToClassList("delete-btn");
-            header.Add(deleteBtn);
             deleteBtn.clicked += () => deleted?.Invoke(_palette);
+            _headerAlignRight.Add(deleteBtn);
 
             _prefabsGrid = new VisualElement();
             _prefabsGrid.AddToClassList("grid");
