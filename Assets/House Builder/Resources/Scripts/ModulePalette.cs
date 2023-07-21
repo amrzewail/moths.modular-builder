@@ -15,5 +15,15 @@ namespace HouseBuilder
 
         public GameObject[] Prefabs => _prefabs;
 
+        public void SetType(string type)
+        {
+            _type = type;
+        }
+
+        public void SetPrefabs(GameObject[] prefabs)
+        {
+            _prefabs = prefabs;
+        }
+
     }
 }

@@ -1,5 +1,6 @@
 using System.Collections;
 using System.Collections.Generic;
+using System.Threading.Tasks;
 using UnityEditor;
 using UnityEngine;
 
@@ -33,6 +34,25 @@ namespace HouseBuilder.Editor
             return position;
 
         } 
+
+
+        public static async Task<Texture2D> GetAssetTexturePreview(Object obj)
+        {
+            Texture2D texture = null;
+            while (texture == null)
+            {
+                texture = AssetPreview.GetAssetPreview(obj);
+                if (texture == null) await System.Threading.Tasks.Task.Delay(100);
+                return texture;
+            }
+            return null;
+        }
+
+        public static void SaveAssetChanges(Object obj)
+        {
+            EditorUtility.SetDirty(obj);
+            AssetDatabase.SaveAssetIfDirty(obj);
+        }
 
     }
 }

@@ -10,5 +10,10 @@ namespace HouseBuilder
     {
         [field: SerializeField] public ModulePalette[] Palettes { get; private set; }
 
+
+        public void SetPalettes(ModulePalette[] palettes)
+        {
+            Palettes = palettes;
+        }
     }
 }

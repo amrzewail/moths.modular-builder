@@ -9,7 +9,7 @@ using UnityEngine.UIElements;
 
 namespace HouseBuilder.Editor.Views
 {
-    public class MainView : VisualElement
+    public class MainView : ScrollView
     {
         private readonly IEditor _editor;
 
@@ -24,7 +24,9 @@ namespace HouseBuilder.Editor.Views
         private Toggle _showAllLevels;
 
         private VisualElement _newHouseView;
+
         private PlacementView _placementView;
+        private PalettesView _palettesView;
 
         private int _lastHouseMaxHeightCount = 0;
 
@@ -65,11 +67,13 @@ namespace HouseBuilder.Editor.Views
             _header.Add(_showAllLevels);
 
 
-            _placementView = new PlacementView(_editor);
             _newHouseView = new VisualElement();
 
+            _placementView = new PlacementView(_editor);
+            _palettesView = new PalettesView(_editor);
 
-            _tabs = new ButtonTabs("Placement", "Editing");
+
+            _tabs = new ButtonTabs("Placement", "Editing", "Palettes");
             _tabs.RemoveLabel();
             _tabs.onTabClicked += TabClickCallback;
             _tabs.Click(0);
@@ -78,7 +82,7 @@ namespace HouseBuilder.Editor.Views
             _header.Add(_tabs);
             
             var newHouseButton = new Button();
-            newHouseButton.text = "Create New";
+            newHouseButton.text = "Create New House";
             newHouseButton.clicked += NewHouseClickCallback;
             _newHouseView.Add(newHouseButton);
 
@@ -116,16 +120,7 @@ namespace HouseBuilder.Editor.Views
 
         private void TabClickCallback(int index, string name)
         {
-            if (_editor.IsHouseValid == false) return;
-
-            _body.Clear();
-            switch (index)
-            {
-                case 0:
-                    _body.Add(_placementView);
-                    _placementView.Refresh();
-                    return;
-            }
+            UpdateVisualElements();
         }
 
         private void NewHouseClickCallback()
@@ -138,13 +133,28 @@ namespace HouseBuilder.Editor.Views
         {
             _body.Clear();
 
-            if (_editor.IsHouseValid)
+            switch (_tabs.CurrentTab)
             {
-                TabClickCallback(_tabs.CurrentTab, "");
-            }
-            else
-            {
-                _body.Add(_newHouseView);
+                case 0:
+                    if (!_editor.IsHouseValid)
+                    {
+                        _body.Add(_newHouseView);
+                        return;
+                    }
+
+                    _body.Add(_placementView);
+                    _placementView.Refresh();
+                    return;
+
+                case 1:
+
+
+                    return;
+
+                case 2:
+                    _body.Add(_palettesView);
+                    _palettesView.Refresh();
+                    return;
             }
         }
 

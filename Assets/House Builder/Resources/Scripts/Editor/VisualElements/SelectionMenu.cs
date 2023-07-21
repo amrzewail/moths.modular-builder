@@ -24,8 +24,7 @@ namespace HouseBuilder.Editor
 
         public SelectionMenu(string label) 
         {
-            this.style.flexDirection = FlexDirection.Row;
-            this.style.justifyContent = Justify.SpaceBetween;
+            this.AddToClassList("selection-menu");
 
             _label = new Label();
             _label.text = label;
@@ -40,9 +39,7 @@ namespace HouseBuilder.Editor
 
         public SelectionMenu()
         {
-            this.style.flexDirection = FlexDirection.Row;
-            this.style.flexGrow = 1;
-            this.style.justifyContent = Justify.SpaceBetween;
+            this.AddToClassList("selection-menu");
 
             _button = new Button(OnButtonClick);
             _button.style.flexGrow = 1;

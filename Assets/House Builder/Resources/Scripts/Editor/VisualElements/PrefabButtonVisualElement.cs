@@ -45,15 +45,9 @@ namespace HouseBuilder.Editor
 
         private async void RefreshPreview()
         {
-            _previewTexture = null;
-            while(_previewTexture == null)
-            {
-                _previewTexture = AssetPreview.GetAssetPreview(prefab);
-
-                this.style.backgroundImage = _previewTexture;
-
-                if (_previewTexture == null) await System.Threading.Tasks.Task.Delay(100);
-            }
+            _previewTexture = await BuilderEditorUtility.GetAssetTexturePreview(_targetPrefab);
+            if (_previewTexture == null) return;
+            this.style.backgroundImage = _previewTexture;
             this.style.minHeight = _previewTexture.height;
             this.style.maxWidth = _previewTexture.width;
 
