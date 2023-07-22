@@ -1,13 +1,90 @@
 :root
 {
-	--selected-color: #116D6E; /*cyan?*/
-	--level-color: #CD1818; /*reddish*/
-	--hover-color: #116D6E; /*cyan?*/
-	--focus-color: #116D6E; /*cyan?*/
-	--border-color: #116D6E; /*cyan?*/
+/*	--dark: #27374D;
+	--mid: #526D82;
+	--light: #9DB2BF;
+	--lighter: #DDE6ED;*/
+
+/*	--dark: #393646;
+	--mid: #4F4557;
+	--light: #6D5D6E;
+	--lighter: #F4EEE0;*/
+
+	--dark: #282828;
+	--mid: #383838;
+	--light: #515151;
+	--lighter: #D2D2D2;
+	--pressed: #46607C;
+
+	--text-inactive-color: var(--light);
+	--text-active-color: var(--lighter);
+
+	--border-color: var(--dark);
+	--border-inactive-color: var(--mid);
+	--border-active-color: var(--lighter);
+
+	--button-inactive-color: var(--dark);
+	--button-active-color: var(--light);
+	--button-hover-color: #676767;
+	--button-press-color: var(--pressed);
+
+	--window-inactive-color: var(--dark);
+	--window-active-color: var(--mid);
+
+	--property-bg-color: var(--dark);
+}
+
+/*VIEWS*/
+
+.main-view
+{
+	background-color: var(--window-inactive-color);
+	height: 100%;
+}
+
+.palettes-view
+{
+	background-color: var(--window-active-color);
+	height: 100%;
+	margin-left: 3px;
+	margin-right: 3px;
+}
+
+.placement-view
+{
+	background-color: var(--window-active-color);
+	height: 100%;
+	margin-left: 3px;
+	margin-right: 3px;
+}
+
+.new-house-view
+{
+	background-color: var(--window-active-color);
+	height: 100%;
+	margin-left: 3px;
+	margin-right: 3px;
 }
 
 /*BUTTONS*/
+
+Button
+{
+	color: var(--text-active-color);
+	border-color: var(--border-color);
+	background-color: var(--button-active-color);
+}
+
+Button:hover
+{
+	background-color: var(--button-hover-color);
+}
+
+Button:active
+{
+	background-color: var(--button-press-color);
+}
+
 
 .back-button
 {
@@ -16,64 +93,145 @@
 
 /*END BUTTONS*/
 
-/*BUTTON TABS*/
 
-ButtonTabs
+/*LABEL*/
+
+Label
 {
-	border-color: black;
-	/*border-bottom-width: 1px;*/
-	/*background-color: rgba(255, 255, 255, 0.2);*/
-	height: auto;
+	color: var(--text-active-color);
 }
 
-ButtonTabs .buttons-container 
+
+/*TABS*/
+
+
+.tabs-container .tabs 
 {
 	display:flex;
 	flex-direction: row;
 	justify-content: center;
 	flex-wrap: wrap;
-	padding: 5px 0;
 	align-items: center;
 }
 
-ButtonTabs Label
+.tabs-container Label
 {
-	font-size: 15px;
-	-unity-font-style: bold;
 	-unity-text-align: upper-center;
-
-	margin-bottom: 5px;
-	border-style: solid;
-	padding: 4px;
-	width: 100px;
-	border-color: black;
-	border-bottom-width: 1px;
+	width: 100%;
 }
 
-ButtonTabs .buttons-container Button
+.tabs-container .tab
 {
+	background-color: var(--window-inactive-color);
 	transition: 0.15s;
-	padding: 3px;
 	display: flex;
 }
 
-ButtonTabs .buttons-container Button:focus
+.tabs-container .tab:focus
 {
-	border: 1px;
-	border-color: blue;
 }
 
-ButtonTabs .buttons-container Button.selected
+.tabs-container .tab.selected
 {
-	background-color: var(--selected-color);
-	border-color: var(--selected-color);
-	border-width: 3px;
+	background-color: var(--window-active-color);
+	color: var(--text-active-color);
+	border-bottom-width: 0px;
 }
 
 
-ButtonTabs .buttons-container Button:hover
+.tabs-container .tab:hover
 {
-	color: black;
+	color: var(--text-active-color);
+}
+
+/*END TABS*/
+
+/*HEIGHT TABS*/
+
+.height-tabs-container
+{
+}
+
+.height-tabs-container Button
+{
+	border-color: var(--border-inactive-color);
+}
+
+.height-tabs-container Label
+{
+	font-size: 12px;
+	-unity-font-style: normal;
+	margin-left: 4px;
+	padding: 2px;
+	-unity-text-align: upper-left;
+}
+
+.height-tabs-container .tab
+{
+	border-radius: 50%;
+	border-width: 1px;
+	width: 20px;
+	height: 20px;
+	font-size: 10px;
+}
+
+.height-tabs-container .selected
+{
+	border-color: var(--border-active-color);
+}
+
+.height-tabs-container .tab-level
+{
+	background-color: var(--pressed);
+}
+
+
+/*END HEIGHT TABS*/
+
+/*Selection Menu*/
+
+.selection-menu .selection-label
+{
+	margin-left: 4px;
+	margin-right: 4px;
+}
+
+.selection-menu .selection-button
+{
+	margin-left: 4px;
+	margin-right: 4px;
+}
+
+/*MAIN EDIT TABS*/
+
+.edit-tabs .tabs
+{
+	flex-direction: row;
+	flex-wrap: nowrap;
+}
+
+.edit-tabs Button
+{
+	border-radius: 2px;
+	border-color: var(--border-inactive-color);
+	color: var(--text-inactive-color);
+
+	flex-grow: 1;
+
+	transition: 0.15s;
+	padding: 3px;
+
+	border-width: 1px;
+	border-bottom-width: 0px;
+
+	margin-bottom: 0px;
+
+}
+
+.edit-tabs Button.selected
+{
+	background-color: var(--window-active-color);
+	color: var(--border-color);
 }
 
 .edit-tabs .buttons-container
@@ -84,12 +242,11 @@ ButtonTabs .buttons-container Button:hover
 
 .edit-tabs .buttons-container Button
 {
-	flex: 1;
-	-unity-font-style: bold;
 	font-size: 14px;
+	background-color: var(--window-inactive-color);
 }
 
-/*END BUTTON TABS*/
+/*END MAIN EDIT TABS*/
 
 
 /*SHOW LEVELS TOGGLE*/
@@ -106,53 +263,35 @@ ButtonTabs .buttons-container Button:hover
 /*END SHOW LEVELS TOGGLE*/
 
 
-/*HEIGHT TABS*/
-
-.height-tabs-container
-{
-}
-
-.height-tabs-container .buttons-container Button
-{
-	border-radius: 50%;
-	width: 20px;
-	height: 20px;
-	font-size: 10px;
-}
-
-
-/*END HEIGHT TABS*/
-
-/*Selection Menu*/
-
-/*.selection-menu
-{
-	this.style.flexDirection = FlexDirection.Row;
-	this.style.justifyContent = Justify.SpaceBetween;
-}*/
-
-/*End Selection Menu*/
-
 
 /*PREFABS TABS*/
 
 .prefabs-tabs .prefab-replace-btn
 {
+	position: absolute;
+	align-self: center;
 	transition-duration: 0.15s;
 	transition-property: translate;
-	translate: 0px 135px;
+	translate: 0px 130px;
 	transition-timing-function: ease-out;
 }
 
 .prefabs-tabs .tab:hover .prefab-replace-btn
 {
-	translate: 0px 80px;
+	translate: 0px 70px;
 }
 
 .prefabs-tabs .tabs .tab
 {
-	width: 150px;
+	width: 100px;
+	height: 100px;
 	overflow: hidden;
+}
+
+.prefabs-tabs .tab:active
+{
+	border-color: var(--border-active-color);
+	border-width: 1px;
 }
 
 
@@ -164,9 +303,9 @@ ButtonTabs .buttons-container Button:hover
 
 .prefabs-tabs .tabs .selected
 {
-	background-color: var(--selected-color);
-	border-color: var(--selected-color);
-	border-width: 2px;
+	background-color: var(--border-active-color);
+	border-color: var(--border-active-color);
+	border-width: 1px;
 }
 
 /*END PREFABS TABS*/
@@ -177,11 +316,14 @@ ButtonTabs .buttons-container Button:hover
 
 .palette-set-element 
 {
+	background-color: var(--window-active-color);
+
 	flex-direction: row;
 	border-color: var(--border-color);
 	border-bottom-width: 1px;
-	padding-top: 2px;
 	justify-content: space-between;
+
+	padding: 6px;
 }
 
 .palette-set-element-buttons
@@ -196,14 +338,19 @@ ButtonTabs .buttons-container Button:hover
 
 .palette-set-editing-header
 {
+	background-color: var(--window-active-color);
 	flex-direction: row;
+	justify-content: space-between;
+	padding-top: 4px;
+	padding-bottom: 4px;
+	border-bottom-width: 1px;
+	border-color: var(--border-color);
 }
 
 .palette-set-editing-header .title-label
 {
 	/*-unity-text-align: upper-right;*/
 	font-size: 14px;
-	-unity-font-style: bold;
 	/*position: absolute;*/
 }
 
@@ -221,6 +368,8 @@ ButtonTabs .buttons-container Button:hover
 
 .module-palette
 {
+	background-color: var(--window-active-color);
+
 	padding-top: 10px;
 	padding-bottom: 5px;
 	border-color: var(--border-color);
@@ -238,7 +387,7 @@ ButtonTabs .buttons-container Button:hover
 	width: 200px;
 }
 
-.module-palette .prefab-property
+.module-palette .object-property
 {
 	flex-direction: column;
 }
@@ -250,52 +399,98 @@ ButtonTabs .buttons-container Button:hover
 	flex-wrap: wrap;
 }
 
-.module-palette .prefab-property .preview
-{
-	width: 75px;
-	height: 75px;
-	-unity-background-scale-mode: stretch-to-fill;
-	border-color: black;
-	border-width: 1px;
-	border-radius: 5px;
-}
-
-.module-palette .prefab-property .preview:hover
-{
-	border-color: var(--border-color);
-	border-width: 2px;
-}
-
-.module-palette .prefab-property .selected
-{
-	border-color: var(--border-color);
-	border-width: 2px;
-}
-
-.module-palette .prefab-property .object-field
-{
-	width: 75px;
-}
-
 .module-palette .delete-btn
 {
 	width: 20px;
 	height: 18px;
 }
 
-.prefab-property .preview:hover .delete-btn
+.object-property
 {
+	width: 75px;
+	padding: 1px;
+}
+
+.object-property .preview
+{
+	background-color: var(--property-bg-color);
+
+	width: auto;
+	height: 75px;
+	-unity-background-scale-mode: stretch-to-fill;
+	border-color: var(--border-color);
+	border-width: 1px;
+	border-radius: 5px;
+	flex-direction: column;
+}
+
+.object-property .preview:hover
+{
+	border-color: var(--border-active-color);
+	border-width: 1px;
+}
+
+.object-property .selected
+{
+	border-color: var(--border-active-color);
+	border-width: 1px;
+}
+
+.object-property .object-field
+{
+	width: auto;
+}
+
+.object-property .delete-btn
+{
+	visibility: hidden;
+	opacity: 0;
+	transition: 0.05s;
+	transition-duration: 0.05s;
+}
+
+.object-property .preview:hover .delete-btn
+{
+	visibility: visible;
 	opacity: 1;
 }
 
-.prefab-property .delete-btn
+.object-property .fallback-label
 {
-	opacity: 0;
-	transition: 0.15s;
-	transition-duration: 0.15s;
+	margin-bottom: 0px;
+	-unity-text-align: middle-center;
+	-unity-font-style: bold;
 }
 
+.module-palette-property
+{
+	margin-left: 4px;
+	margin-right: 4px;
+	width: auto;
+	padding-top: 10px;
+	padding-bottom: 20px;
+}
 
+.module-palette-property .preview
+{
+	width: auto;
+	height: 50px;
+}
+
+.module-palette-property .object-field
+{
+	visibility: hidden;
+}
+
+.module-palette-property .fallback-label
+{
+	width: 100%;
+	height: 100%;
+	margin-left: 4px;
+	margin-right: 4px;
+	font-size: 14px;
+	white-space: normal;
+}
 
 /*End Module Palette*/
 
@@ -319,7 +514,22 @@ ButtonTabs .buttons-container Button:hover
 
 .delete-btn:active
 {
-	background-color: var(--focus-color);
+	background-color: var(--pressed);
 }
 
 /*End Delete Button*/
+
+
+/*Individual Buttons*/
+
+.new-house-btn
+{
+	margin: 10px;
+	padding: 4px;
+}
+
+.new-palette-set-btn
+{
+	margin: 10px;
+	padding: 4px;
+}

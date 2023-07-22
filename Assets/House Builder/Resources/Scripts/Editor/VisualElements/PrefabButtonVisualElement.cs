@@ -48,8 +48,8 @@ namespace HouseBuilder.Editor
             _previewTexture = await BuilderEditorUtility.GetAssetTexturePreview(_targetPrefab);
             if (_previewTexture == null) return;
             this.style.backgroundImage = _previewTexture;
-            this.style.minHeight = _previewTexture.height;
-            this.style.maxWidth = _previewTexture.width;
+            //this.style.minHeight = _previewTexture.height;
+            //this.style.maxWidth = _previewTexture.width;
 
         }
 

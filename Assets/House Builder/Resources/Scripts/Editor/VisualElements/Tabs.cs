@@ -10,11 +10,12 @@ namespace HouseBuilder.Editor
     public class Tabs<T> : VisualElement where T : VisualElement
     {
         private List<T> _tabs = new List<T>();
-        private Dictionary<int, Color> _bgColorOverrides = new Dictionary<int, Color>();
 
         public event Action<int> onTabClicked;
 
         public int Current { get; private set; }
+
+        public int TabsCount => _tabs.Count;
 
         private Label _label;
         private VisualElement _tabsContainer;
@@ -57,6 +58,8 @@ namespace HouseBuilder.Editor
 
         private void Init()
         {
+            this.AddToClassList("tabs-container");
+
             _label = new Label();
             _tabsContainer = new VisualElement();
             _tabsContainer.AddToClassList("tabs");
@@ -103,20 +106,23 @@ namespace HouseBuilder.Editor
             if (index < 0) return;
             if (index >= _tabs.Count) return;
             Current = index;
-            UpdateTabBackgroundColors();
+
+            _tabs.FirstOrDefault(x => x.ClassListContains("selected"))?.RemoveFromClassList("selected");
+            _tabs[Current].AddToClassList("selected");
         }
 
-
-        public void UpdateTabBackgroundColors()
+        public void RemoveAllTabsClass(string className)
         {
-            _tabs.FirstOrDefault(x => x.ClassListContains("selected"))?.RemoveFromClassList("selected");
-
-            foreach (var container in _bgColorOverrides)
+            foreach(var tab in _tabs)
             {
-                _tabs[container.Key].style.backgroundColor = container.Value;
+                if (!tab.ClassListContains(className)) continue;
+                tab.RemoveFromClassList(className);
             }
+        }
 
-            _tabs[Current].AddToClassList("selected");
+        public void AddTabClass(int index, string className)
+        {
+            _tabs[index].AddToClassList(className);
         }
     }
 }

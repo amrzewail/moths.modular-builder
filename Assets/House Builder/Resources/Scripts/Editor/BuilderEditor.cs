@@ -171,6 +171,7 @@ namespace HouseBuilder.Editor
 
         private void SceneGUICallback(SceneView view)
         {
+            if (Input == null) return;
             Input.Update();
 
             if (IsHouseValid)

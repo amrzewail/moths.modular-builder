@@ -13,7 +13,7 @@ namespace HouseBuilder
 
         public string Type => _type;
 
-        public GameObject[] Prefabs => _prefabs;
+        public GameObject[] Prefabs => _prefabs == null ? new GameObject[0] : _prefabs;
 
         public void SetType(string type)
         {

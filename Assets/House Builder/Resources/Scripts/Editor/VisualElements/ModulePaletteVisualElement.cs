@@ -28,6 +28,7 @@ namespace HouseBuilder.Editor
             this.Add(header);
 
             _moduleType = new SelectionMenu<string>();
+            _moduleType.AddToClassList("module-type-selection");
             _moduleType.onSelected += ModuleTypeChangeCallback;
             header.Add(_moduleType);
 
@@ -72,16 +73,16 @@ namespace HouseBuilder.Editor
             _prefabsGrid.Clear();
 
             int index = 0;
-            foreach(var prefab in _palette.Prefabs)
+            foreach(var prefab in prefabsList)
             {
                 int i = index;
-                PrefabPropertyVisualElement property = new PrefabPropertyVisualElement(prefab);
-                property.prefabChanged += g => PrefabChangedCallback(i, g);
+                PropertyVisualElement<GameObject> property = new PropertyVisualElement<GameObject>(prefab);
+                property.propertyChanged += g => PrefabChangedCallback(i, g);
                 _prefabsGrid.Add(property);
                 index++;
             }
-            var addPrefab = new PrefabPropertyVisualElement(null);
-            addPrefab.prefabChanged += g => PrefabChangedCallback(index, g);
+            var addPrefab = new PropertyVisualElement<GameObject>(null);
+            addPrefab.propertyChanged += g => PrefabChangedCallback(index, g);
             _prefabsGrid.Add(addPrefab);
         }
 
@@ -104,15 +105,15 @@ namespace HouseBuilder.Editor
             EditorGUIUtility.PingObject(_palette);
         }
 
-        private void PrefabChangedCallback(int index, GameObject newPrefab)
+        private bool PrefabChangedCallback(int index, GameObject newPrefab)
         {
             List<GameObject> prefabs = _palette.Prefabs.ToList();
             if (index == prefabs.Count)
             {
                 prefabs.Add(newPrefab);
 
-                var addPrefab = new PrefabPropertyVisualElement(null);
-                addPrefab.prefabChanged += g => PrefabChangedCallback(prefabs.Count, g);
+                var addPrefab = new PropertyVisualElement<GameObject>(null);
+                addPrefab.propertyChanged += g => PrefabChangedCallback(prefabs.Count, g);
                 _prefabsGrid.Add(addPrefab);
             }
             else
@@ -130,6 +131,8 @@ namespace HouseBuilder.Editor
             _palette.SetPrefabs(prefabs.ToArray());
             BuilderEditorUtility.SaveAssetChanges(_palette);
             UpdatePrefabs();
+
+            return true;
         }
 
     }

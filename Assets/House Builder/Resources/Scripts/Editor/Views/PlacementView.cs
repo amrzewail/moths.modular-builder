@@ -20,6 +20,8 @@ namespace HouseBuilder.Editor.Views
 
         public PlacementView(IEditor editor)
         {
+            this.AddToClassList("placement-view");
+
             _editor = editor;
             _editor.OnUpdate += Update;
             CreateGUI();

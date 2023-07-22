@@ -44,7 +44,8 @@ namespace HouseBuilder.Editor.Views
 
             _paletteSetList = new ScrollView();
 
-            _newPaletteSetBtn = new Button() { text = "New palette set" };
+            _newPaletteSetBtn = new Button() { text = $"New {nameof(PaletteSet)}" };
+            _newPaletteSetBtn.AddToClassList("new-palette-set-btn");
             _newPaletteSetBtn.clicked += NewPaletteSetCallback;
 
             _state = State.PaletteSetListing;
@@ -110,6 +111,13 @@ namespace HouseBuilder.Editor.Views
 
         private void RefreshPaletteSetEditing()
         {
+            if (!_currentEditingSet)
+            {
+                _state = State.PaletteSetListing;
+                Refresh();
+                return;
+            }
+
             VisualElement header = new VisualElement();
             header.AddToClassList("palette-set-editing-header");
             this.Add(header);
@@ -125,24 +133,31 @@ namespace HouseBuilder.Editor.Views
             currentPaletteSetLabel.AddToClassList("title-label");
             header.Add(currentPaletteSetLabel);
 
+            var highlightPaletteSet = new Button();
+            highlightPaletteSet.text = "Highlight";
+            highlightPaletteSet.clicked += () => EditorGUIUtility.PingObject(_currentEditingSet);
+            header.Add(highlightPaletteSet);
+
             ScrollView modulePaletteList = new ScrollView();
             this.Add(modulePaletteList);
 
-            foreach(var palette in _currentEditingSet.Palettes)
+            var palettes = _currentEditingSet.Palettes == null ? new ModulePalette[0] : _currentEditingSet.Palettes;
+
+            foreach (var palette in palettes)
             {
                 ModulePaletteVisualElement modulePalette = new ModulePaletteVisualElement(palette);
                 modulePalette.deleted += ModulePaletteDeleteCallback;
                 modulePaletteList.Add(modulePalette);
             }
-
-            Button addPaletteBtn = new Button();
-            addPaletteBtn.text = "Add palette";
-            addPaletteBtn.AddToClassList("add-palette-btn");
-            addPaletteBtn.clicked += AddPaletteCallback;
-            modulePaletteList.Add(addPaletteBtn);
+            PropertyVisualElement<ModulePalette> newModulePalette = new PropertyVisualElement<ModulePalette>(null);
+            newModulePalette.AddToClassList("module-palette-property");
+            newModulePalette.propertyChanged += AddModulePaletteCallback;
+            newModulePalette.create += NewModulePaletteCallback;
+            newModulePalette.imageFallbackText = $"Click to create new / Drag and Drop {nameof(ModulePalette)}";
+            modulePaletteList.Add(newModulePalette);
         }
 
-        private void AddPaletteCallback()
+        private void NewModulePaletteCallback()
         {
             string path = EditorUtility.SaveFilePanel("Select palette", "Assets", "New Palette", "asset");
             if (string.IsNullOrEmpty(path)) return;
@@ -165,6 +180,19 @@ namespace HouseBuilder.Editor.Views
             BuilderEditorUtility.SaveAssetChanges(_currentEditingSet);
             Refresh();
         }
+
+        private bool AddModulePaletteCallback(ModulePalette palette)
+        {
+            if (!palette) return false;
+            var list = _currentEditingSet.Palettes == null ? new List<ModulePalette>() : _currentEditingSet.Palettes.ToList();
+            if (list.Contains(palette)) return false;
+            list.Add(palette);
+            _currentEditingSet.SetPalettes(list.ToArray());
+            BuilderEditorUtility.SaveAssetChanges(_currentEditingSet);
+            Refresh();
+            return true;
+        }
+
 
         private void ModulePaletteDeleteCallback(ModulePalette palette)
         {

@@ -24,26 +24,38 @@ namespace HouseBuilder.Editor
 
         public SelectionMenu(string label) 
         {
-            this.AddToClassList("selection-menu");
-
-            _label = new Label();
-            _label.text = label;
-            _label.style.minWidth = 100;
-            this.Add(_label);
-
-
-            _button = new Button(OnButtonClick);
-            _button.style.flexGrow = 1;
-            this.Add(_button);
+            Init(label);
         }
 
         public SelectionMenu()
         {
+            Init("");
+        }
+
+        private void Init(string label)
+        {
             this.AddToClassList("selection-menu");
+
+            if (!string.IsNullOrEmpty(label))
+            {
+                _label = new Label();
+                _label.text = label;
+                _label.style.minWidth = 100;
+                _label.AddToClassList("selection-label");
+                this.Add(_label);
+            }
+
 
             _button = new Button(OnButtonClick);
             _button.style.flexGrow = 1;
+            _button.AddToClassList("selection-button");
             this.Add(_button);
+
+            var dropdownIcon = new Label("v");
+            dropdownIcon.style.width = Length.Percent(100);
+            dropdownIcon.style.unityTextAlign = TextAnchor.MiddleLeft;
+            dropdownIcon.style.marginLeft = 4;
+            _button.Add(dropdownIcon);
         }
 
         public void Refresh(T[] sets, Func<T, string> nameSelector)

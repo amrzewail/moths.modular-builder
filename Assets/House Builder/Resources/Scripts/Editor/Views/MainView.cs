@@ -17,10 +17,9 @@ namespace HouseBuilder.Editor.Views
         private VisualElement _body;
 
 
-        private ButtonTabs _tabs;
+        private Tabs<Button> _tabs;
 
-
-        private ButtonTabs _heightTabs;
+        private Tabs<Button> _heightTabs;
         private Toggle _showAllLevels;
 
         private VisualElement _newHouseView;
@@ -32,6 +31,9 @@ namespace HouseBuilder.Editor.Views
 
         public MainView(IEditor editor)
         {
+            this.AddToClassList("main-view");
+            this.verticalScrollerVisibility = ScrollerVisibility.AlwaysVisible;
+
             _editor = editor;
             _editor.OnSelectionChanged += OnSelectionChanged;
             _editor.OnBeforeSelectionChange += OnBeforeSelectionChange;
@@ -48,13 +50,15 @@ namespace HouseBuilder.Editor.Views
             //_levelTabs.label.text = "Level";
             //_levelTabs.onTabClicked += LevelTabClickCallback;
 
-            _heightTabs = new ButtonTabs();
+            _heightTabs = new Tabs<Button>();
             for(int i = 0; i < 31; i++)
             {
-                _heightTabs.AddTab($"{i}");
+                Button btn = new Button();
+                btn.text = $"{i}";
+                _heightTabs.AddTab(btn);
             }
 
-            _heightTabs.label.text = "Height";
+            _heightTabs.label = "Height";
             _heightTabs.onTabClicked += HeightTabClickCallback;
             _heightTabs.AddToClassList("height-tabs-container");
 
@@ -68,22 +72,26 @@ namespace HouseBuilder.Editor.Views
 
 
             _newHouseView = new VisualElement();
+            _newHouseView.AddToClassList("new-house-view");
 
             _placementView = new PlacementView(_editor);
             _palettesView = new PalettesView(_editor);
 
 
-            _tabs = new ButtonTabs("Placement", "Editing", "Palettes");
-            _tabs.RemoveLabel();
+            _tabs = new Tabs<Button>(
+                new Button { text = "Placement" },
+                new Button { text = "Editing" },
+                new Button { text = "Palettes" });
             _tabs.onTabClicked += TabClickCallback;
             _tabs.Click(0);
             _tabs.AddToClassList("edit-tabs");
 
             _header.Add(_tabs);
-            
+
             var newHouseButton = new Button();
             newHouseButton.text = "Create New House";
             newHouseButton.clicked += NewHouseClickCallback;
+            newHouseButton.AddToClassList("new-house-btn");
             _newHouseView.Add(newHouseButton);
 
 
@@ -102,7 +110,7 @@ namespace HouseBuilder.Editor.Views
             UpdateHouseVisibility();
         }
 
-        private void HeightTabClickCallback(int index, string arg2)
+        private void HeightTabClickCallback(int index)
         {
             _editor.Grid.totalHeightIndex = index;
             UpdateHouseVisibility();
@@ -118,7 +126,7 @@ namespace HouseBuilder.Editor.Views
 
 
 
-        private void TabClickCallback(int index, string name)
+        private void TabClickCallback(int index)
         {
             UpdateVisualElements();
         }
@@ -133,7 +141,7 @@ namespace HouseBuilder.Editor.Views
         {
             _body.Clear();
 
-            switch (_tabs.CurrentTab)
+            switch (_tabs.Current)
             {
                 case 0:
                     if (!_editor.IsHouseValid)
@@ -176,17 +184,17 @@ namespace HouseBuilder.Editor.Views
             {
                 if (_heightTabs != null && _lastHouseMaxHeightCount != _editor.House.gridsPerLevel)
                 {
-                    _heightTabs.ClearBackgroundColorOverrides();
+                    _heightTabs.RemoveAllTabsClass("tab-level");
                     for (int i = 0; i < _heightTabs.TabsCount; i++)
                     {
-                        if (i % _editor.House.gridsPerLevel == 0) _heightTabs.OverrideTabBackgroundColor(i, Color.red);
+                        if (i % _editor.House.gridsPerLevel == 0) _heightTabs.AddTabClass(i, "tab-level");
+
                     }
-                    _heightTabs.UpdateTabBackgroundColors();
                     _lastHouseMaxHeightCount = _editor.House.gridsPerLevel;
                 }
             }
 
-            if (_editor.Grid.totalHeightIndex != _heightTabs.CurrentTab)
+            if (_editor.Grid.totalHeightIndex != _heightTabs.Current)
             {
                 _heightTabs.ClickNoCallback(_editor.Grid.totalHeightIndex);
                 UpdateHouseVisibility();
