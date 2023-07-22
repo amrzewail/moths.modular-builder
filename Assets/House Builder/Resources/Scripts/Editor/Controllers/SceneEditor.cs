@@ -25,7 +25,7 @@ namespace HouseBuilder.Editor.Controllers
 
         private bool CheckForDuplication(Vector3 position, Vector3 eulerAngles, GameObject prefab)
         {
-            List<GameObject> currentPlacedElements = _editor.House.GetAtPosition(_editor.Palettes.ModuleType, _editor.Grid.CurrentLevelIndex, position, _editor.Grid.gridSize.magnitude / 4f);
+            List<GameObject> currentPlacedElements = _editor.House.GetAtPosition(_editor.Palettes.CurrentModuleType, _editor.Grid.CurrentLevelIndex, position, _editor.Grid.gridSize.magnitude / 4f);
             bool isDuplicated;
             foreach(var currentPlacedElement in currentPlacedElements)
             {
@@ -42,7 +42,7 @@ namespace HouseBuilder.Editor.Controllers
 
         private void DestroyAtPosition(Vector3 position)
         {
-            var g = _editor.House.GetAtPosition(_editor.Palettes.ModuleType, _editor.Grid.CurrentLevelIndex, position, _editor.Grid.gridSize.magnitude / 4f);
+            var g = _editor.House.GetAtPosition(_editor.Palettes.CurrentModuleType, _editor.Grid.CurrentLevelIndex, position, _editor.Grid.gridSize.magnitude / 4f);
             if (g.Count == 0) return;
             DestroyGameObject(g[0]);
         }
@@ -72,7 +72,7 @@ namespace HouseBuilder.Editor.Controllers
         {
             GameObject module = (GameObject)PrefabUtility.InstantiatePrefab(prefab);
             module.name = prefab.name;
-            _editor.House.Add(_editor.Palettes.ModuleType, _editor.Grid.CurrentLevelIndex, module);
+            _editor.House.Add(_editor.Palettes.CurrentModuleType, _editor.Grid.CurrentLevelIndex, module);
             Undo.RegisterCreatedObjectUndo(module, "Created module object");
             return module;
         }
@@ -120,8 +120,8 @@ namespace HouseBuilder.Editor.Controllers
             }
             else
             {
-                gameObjects = _editor.House.GetAllAtHeight(_editor.Palettes.ModuleType, _editor.Grid.CurrentLevelIndex, _editor.Grid.CurrentHeightIndex);
-                _editor.Grid.totalHeightIndex++;
+                //gameObjects = _editor.House.GetAllAtHeight(_editor.Palettes.ModuleType, _editor.Grid.CurrentLevelIndex, _editor.Grid.CurrentHeightIndex);
+                //_editor.Grid.totalHeightIndex++;
             }
 
             _editor.Selector.Clear();
@@ -185,10 +185,10 @@ namespace HouseBuilder.Editor.Controllers
                     break;
 
                 case KeyCommand.HighlightClick:
-                    if (_editor.Previewer.Prefab)
-                    {
-                        _editor.Previewer.Clean();
-                    }
+                    //if (_editor.Previewer.Prefab)
+                    //{
+                    //    _editor.Previewer.Clean();
+                    //}
                     break;
 
                 case KeyCommand.LeftMouseButtonUp:

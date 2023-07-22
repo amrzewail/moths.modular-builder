@@ -200,6 +200,7 @@ Label
 {
 	margin-left: 4px;
 	margin-right: 4px;
+	-unity-text-align: middle-left;
 }
 
 /*MAIN EDIT TABS*/
@@ -225,6 +226,8 @@ Label
 	border-bottom-width: 0px;
 
 	margin-bottom: 0px;
+
+	font-size: 14px;
 
 }
 
@@ -264,44 +267,120 @@ Label
 
 
 
-/*PREFABS TABS*/
 
-.prefabs-tabs .prefab-replace-btn
+/*Modules and prefabs list*/
+
+.placement-view .selection-menu
+{
+	padding: 4px;
+	padding-left: 2px;
+	height: 50px;
+}
+
+
+.placement-palette-list .module-type-element
+{
+	padding-top: 10px;
+	padding-bottom: 5px;
+	border-color: var(--border-color);
+	border-bottom-width: 1px;
+}
+
+
+.placement-palette-list .module-type-element .header
+{
+	display: flex;
+	flex-direction: row;
+	justify-content: space-between;
+	flex-wrap: nowrap;
+}
+
+.placement-palette-list .title-btn
+{
+	background-color: rgba(0,0,0,0);
+
+	border-width: 0px;
+	flex-grow: 1;
+	margin-left: 6px;
+	margin-right: 12px;
+	font-size: 14px;
+}
+
+.placement-palette-list .title-btn:hover
+{
+	background-color: var(--button-hover-color);
+}
+
+
+.placement-palette-list .title-btn:active
+{
+	background-color: var(--button-press-color);
+}
+
+
+.placement-palette-list .module-type-element .expand-btn
+{
+	width: 20px;
+	height: 20px;
+}
+
+.placement-palette-list .prefabs-tabs
+{
+	overflow: hidden;
+	height: auto;
+}
+
+.placement-palette-list .prefabs-tabs.unexpanded
+{
+	max-height: 0px;
+}
+
+
+.placement-palette-list .prefabs-tabs .prefab-label
+{
+	font-size: 12px;
+	white-space: wrap;
+}
+
+.placement-palette-list .prefabs-tabs .prefab-replace-btn
 {
 	position: absolute;
 	align-self: center;
 	transition-duration: 0.15s;
 	transition-property: translate;
-	translate: 0px 130px;
+	translate: 0px 100px;
 	transition-timing-function: ease-out;
 }
 
-.prefabs-tabs .tab:hover .prefab-replace-btn
+.placement-palette-list .prefabs-tabs .tab:hover .prefab-replace-btn
 {
 	translate: 0px 70px;
+	height: 20px;
 }
 
-.prefabs-tabs .tabs .tab
+.placement-palette-list .prefabs-tabs .tabs .tab
 {
 	width: 100px;
 	height: 100px;
 	overflow: hidden;
 }
 
-.prefabs-tabs .tab:active
+.placement-palette-list .prefabs-tabs .tab:active
 {
 	border-color: var(--border-active-color);
 	border-width: 1px;
 }
 
 
-.prefabs-tabs .tabs 
+.placement-palette-list .prefabs-tabs .tabs 
 {
 	flex-direction: row;
 	flex-wrap: wrap;
+	justify-content: flex-start;
+	padding: 4px;
 }
 
-.prefabs-tabs .tabs .selected
+.placement-palette-list .prefabs-tabs .tabs .selected
 {
 	background-color: var(--border-active-color);
 	border-color: var(--border-active-color);
@@ -520,7 +599,34 @@ Label
 /*End Delete Button*/
 
 
-/*Individual Buttons*/
+/*Button Toggle*/
+
+
+.button-toggle
+{
+	width: 200px;
+	border-color: var(--border-inactive-color);
+	border-width: 1px;
+	padding: 0px;
+	margin: 6px;
+}
+
+.button-toggle Button
+{
+	transition: 0.15s;
+	background-color: var(--button-inactive-color);
+	margin:0px;
+	padding: 0px;
+	border-radius: 0px;
+}
+
+.button-toggle .isOn
+{
+	background-color: var(--button-press-color);
+}
+
+
+/*Individual Elements*/
 
 .new-house-btn
 {
@@ -532,4 +638,16 @@ Label
 {
 	margin: 10px;
 	padding: 4px;
+}
+
+.shortcuts-label
+{
+	color: rgba(255,255,255,0.5);
+	padding: 6px;
+}
+
+.transforms-label
+{
+	color: rgba(255,255,255,0.5);
+	padding-left: 6px;
 }

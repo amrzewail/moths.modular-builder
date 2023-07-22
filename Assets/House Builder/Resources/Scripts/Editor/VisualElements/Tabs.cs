@@ -68,7 +68,7 @@ namespace HouseBuilder.Editor
         }
 
 
-        public void AddTab(T tab)
+        public void AddTab(T tab, int autoSelectIndex = 0)
         {
             VisualElement vs = tab;
 
@@ -81,7 +81,7 @@ namespace HouseBuilder.Editor
             _tabsContainer.Add(tab);
             _tabs.Add(tab);
 
-            if (index == 0) ButtonClick(index);
+            if (index == autoSelectIndex) ButtonClick(index);
         }
 
         private void ButtonClick(int index)
@@ -100,6 +100,8 @@ namespace HouseBuilder.Editor
         {
             ButtonClick(index);
         }
+
+        public T GetTab(int index) => _tabs[index];
 
         public void ClickNoCallback(int index)
         {
@@ -123,6 +125,16 @@ namespace HouseBuilder.Editor
         public void AddTabClass(int index, string className)
         {
             _tabs[index].AddToClassList(className);
+        }
+
+        public void ClearSelection()
+        {
+            if (Current < 0) return;
+            if (_tabs[Current].ClassListContains("selected"))
+            {
+                _tabs[Current].RemoveFromClassList("selected");
+            }
+            Current = -1;
         }
     }
 }

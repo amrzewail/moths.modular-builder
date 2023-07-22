@@ -9,11 +9,9 @@ namespace HouseBuilder.Editor.Controllers
         bool IsLoaded { get; }
 
         PaletteSet[] PaletteSets { get; }
-        PaletteSet PaletteSet { get; set; }
+        PaletteSet CurrentPaletteSet { get; set; }
 
-        string ModuleType { get; set; }
-
-        ModulePalette Palette { get; }
+        string CurrentModuleType { get; set; }
 
         bool LoadPaletteSets();
 

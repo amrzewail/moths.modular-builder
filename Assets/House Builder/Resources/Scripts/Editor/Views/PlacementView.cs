@@ -12,18 +12,20 @@ namespace HouseBuilder.Editor.Views
     {
         private readonly IEditor _editor;
 
-        private SelectionMenu<PaletteSet> _paletteSetSelection;
-        private SelectionMenu<string> _moduleTypeSelection;
-        private Label _transformLabel;
-        private Tabs<PrefabButtonVisualElement> _prefabsTabs;
+        private List<ModulePalettePlacementVisualElement> _palettesElements = new List<ModulePalettePlacementVisualElement>();
 
+        private SelectionMenu<PaletteSet> _paletteSetSelection;
+        private Label _transformLabel;
+        private VisualElement _modulePalettesList;
 
         public PlacementView(IEditor editor)
         {
-            this.AddToClassList("placement-view");
 
             _editor = editor;
             _editor.OnUpdate += Update;
+
+            _palettesElements = new List<ModulePalettePlacementVisualElement>();
+
             CreateGUI();
 
         }
@@ -31,8 +33,9 @@ namespace HouseBuilder.Editor.Views
 
         private void CreateGUI()
         {
+            this.AddToClassList("placement-view");
+
             Label shortcuts = new Label();
-            shortcuts.style.color = new Color(1, 1, 1, 0.5f);
             shortcuts.text = 
                 "LMB: Place modules\n" +
                 "Alt + Scroll wheel: Rotate module\n" +
@@ -42,10 +45,11 @@ namespace HouseBuilder.Editor.Views
                 "E: Extrude selected up\n" +
                 "Esc: Clear selections\n" +
                 "";
+            shortcuts.AddToClassList("shortcuts-label");
             this.Add(shortcuts);
 
             _transformLabel = new Label();
-            _transformLabel.style.color = new Color(1, 1, 1, 0.5f);
+            _transformLabel.AddToClassList("transforms-label");
             this.Add(_transformLabel);
 
             VisualElement paletteSetAndModuleTypeHorizontal = new VisualElement();
@@ -57,30 +61,29 @@ namespace HouseBuilder.Editor.Views
             _paletteSetSelection.onSelected += PaletteSetSelectCallback;
             _paletteSetSelection.isItemDisabled += (paletteSet) => paletteSet.Palettes.Length == 0;
 
-            _moduleTypeSelection = new SelectionMenu<string>("Module Type");
-            _moduleTypeSelection.style.flexGrow = 1;
-            _moduleTypeSelection.onSelected += ModuleChangeCallback;
-
-
             paletteSetAndModuleTypeHorizontal.Add(_paletteSetSelection);
-            paletteSetAndModuleTypeHorizontal.Add(_moduleTypeSelection);
-
 
             this.Add(paletteSetAndModuleTypeHorizontal);
 
 
-            var raiseButton = new Button();
-            raiseButton.text = "Extrude Up";
-            raiseButton.clicked += RaiseCallback;
+            //var raiseButton = new Button();
+            //raiseButton.text = "Extrude Up";
+            //raiseButton.clicked += RaiseCallback;
 
-            this.Add(raiseButton);
+            //this.Add(raiseButton);
 
-            ScrollView scrollView = new ScrollView();
-            _prefabsTabs = new Tabs<PrefabButtonVisualElement>();
-            _prefabsTabs.AddToClassList("prefabs-tabs");
-            _prefabsTabs.onTabClicked += PrefabButtonCallback;
-            scrollView.Add(_prefabsTabs);
-            this.Add(scrollView);
+            _modulePalettesList = new VisualElement();
+            _modulePalettesList.AddToClassList("placement-palette-list");
+            this.Add(_modulePalettesList);
+
+            //_modulePalette = new VisualElement();
+            //_modulePalette.AddToClassList("module-palette-element");
+            //this.Add(_modulePalette);
+
+            //_prefabsTabs = new Tabs<PrefabButtonVisualElement>();
+            //_prefabsTabs.AddToClassList("prefabs-tabs");
+            //_prefabsTabs.onTabClicked += PrefabButtonCallback;
+            //_modulePalette.Add(_prefabsTabs);
         }
 
 
@@ -89,7 +92,7 @@ namespace HouseBuilder.Editor.Views
             if (_editor.Palettes.LoadPaletteSets())
             {
                 _paletteSetSelection.Refresh(_editor.Palettes.PaletteSets, x => x.name);
-                _paletteSetSelection.Select(_editor.Palettes.PaletteSet);
+                _paletteSetSelection.Select(_editor.Palettes.CurrentPaletteSet);
 
                 UpdateModuleTypeList();
                 
@@ -98,27 +101,29 @@ namespace HouseBuilder.Editor.Views
 
         private void UpdateModuleTypeList()
         {
-            var types = ModuleTypeUtility.GetTypes(_editor.Palettes.PaletteSet);
-            if (types.Count > 0)
+            _modulePalettesList.Clear();
+            _palettesElements.Clear();
+
+            var currentSet = _editor.Palettes.CurrentPaletteSet;
+            if (currentSet.Palettes == null) return;
+
+
+            foreach (var palette in currentSet.Palettes)
             {
-                _moduleTypeSelection.Refresh(types.ToArray(), x => x);
-                _moduleTypeSelection.Select(types[0]);
+                ModulePalettePlacementVisualElement modulePaletteVE = new ModulePalettePlacementVisualElement(palette);
+                _modulePalettesList.Add(modulePaletteVE);
+                modulePaletteVE.selected += (type, prefab) => ModuleSelectedCallback(modulePaletteVE, type, prefab);
+                _palettesElements.Add(modulePaletteVE);
             }
-            else
-            {
-                _moduleTypeSelection.Refresh(new string[] { "None" }, x => x);
-                _moduleTypeSelection.Select("None");
-            }
-            ModuleChangeCallback(_moduleTypeSelection.Current);
+
+            _editor.Logger.Log(nameof(PlacementView), $"Updated modules list.");
         }
 
         private bool PaletteSetSelectCallback(PaletteSet set)
         {
-            _editor.Palettes.PaletteSet = set;
-            _editor.Logger.Log(nameof(PlacementView), $"Changed palette set to {set.name}");
+            _editor.Palettes.CurrentPaletteSet = set;
 
             UpdateModuleTypeList();
-            UpdateModulesGrid();
             return true;
         }
 
@@ -127,34 +132,18 @@ namespace HouseBuilder.Editor.Views
             _editor.SceneEditor.ExtrudeHeight();
         }
 
-        private bool ModuleChangeCallback(string type)
-        {
-            _editor.Logger.Log(nameof(PlacementView), $"Changed module type to {type}.");
-            _editor.Palettes.ModuleType = type;
-            UpdateModulesGrid();
-
-            return true;
-        }
-
-        private void UpdateModulesGrid()
-        {
-            _prefabsTabs.ClearTabs();
-            if (!_editor.Palettes.Palette) return;
-            int i = 0;
-            foreach(var prefab in _editor.Palettes.Palette.Prefabs)
-            {
-                var prefabVE = new PrefabButtonVisualElement(prefab);
-                _prefabsTabs.AddTab(prefabVE);
-                i++;
-            }
-            _editor.Logger.Log(nameof(PlacementView), $"Updated modules grid.");
-        }
-
-        private void PrefabButtonCallback(int index)
+        private void ModuleSelectedCallback(ModulePalettePlacementVisualElement element, string moduleType, GameObject prefab)
         {
             if (!_editor.IsHouseValid) return;
 
-            _editor.Previewer.SetPrefab(_editor.Palettes.Palette.Prefabs[index]);
+            _editor.Palettes.CurrentModuleType = moduleType;
+            _editor.Previewer.SetPrefab(prefab);
+
+            foreach(var p in _palettesElements)
+            {
+                if (p == element) continue;
+                p.ClearSelection();
+            }
         }
 
 

@@ -14,52 +14,29 @@ namespace HouseBuilder.Editor.Controllers
 
         public PaletteSet[] PaletteSets { get; private set; }
 
-
-        public PaletteSet PaletteSet
-        {
-            get => _currentPaletteSet;
-            set
-            {
-                _currentPaletteSet = value;
-                ModuleType = "";
-                if (!PaletteSet) return;
-                if (PaletteSet.Palettes.Length > 0)
-                {
-                    Palette = PaletteSet.Palettes[0];
-                    if (Palette)
-                    {
-                        ModuleType = Palette.Type;
-                    }
-                }
-            }
-        }
-        public string ModuleType
+        public string CurrentModuleType
         {
             get => _currentModuleType;
             set
             {
+                if (_currentModuleType == value) return;
                 _currentModuleType = value;
-                Palette = null;
-                if (!PaletteSet) return;
-                if (PaletteSet.Palettes == null) return;
-
-                for (int i = 0; i < PaletteSet.Palettes.Length; i++)
-                {
-                    if (!PaletteSet.Palettes[i])
-                    {
-                        _logger.Error(nameof(PaletteManager), $"Empty palette array element in {PaletteSet.name}.");
-                        continue;
-                    }
-                    if (PaletteSet.Palettes[i].Type == ModuleType)
-                    {
-                        Palette = PaletteSet.Palettes[i];
-                        break;
-                    }
-                }
+                _logger.Log(nameof(PaletteManager), $"Changed module type to {_currentModuleType}.");
             }
         }
 
-        public ModulePalette Palette { get; private set; }
+
+        public PaletteSet CurrentPaletteSet
+        {
+            get => _currentPaletteSet;
+            set
+            {
+                if (_currentPaletteSet == value) return;
+                _currentPaletteSet = value;
+                _logger.Log(nameof(PaletteManager), $"Changed palette set to {_currentPaletteSet.name}");
+
+            }
+        }
 
         public PaletteManager(ILogger logger)
         {
@@ -72,12 +49,7 @@ namespace HouseBuilder.Editor.Controllers
             PaletteSets = Resources.LoadAll<PaletteSet>("");
             if (PaletteSets.Length > 0)
             {
-                if (!PaletteSet) PaletteSet = PaletteSets[0];
-                if (PaletteSet.Palettes.Length > 0)
-                {
-                    Palette = PaletteSet.Palettes[0];
-                    ModuleType = Palette.Type;
-                }
+                if (!CurrentPaletteSet) CurrentPaletteSet = PaletteSets[0];
                 IsLoaded = true;
                 _logger.Log(nameof(PaletteManager), "Palette sets loaded successfully.");
                 return true;

@@ -23,6 +23,7 @@ namespace HouseBuilder.Editor
             this.style.unityBackgroundScaleMode = ScaleMode.ScaleToFit;
 
             Label label = new Label(prefab.name);
+            label.AddToClassList("prefab-label");
             this.Add(label);
 
             var replaceButton = new Button();

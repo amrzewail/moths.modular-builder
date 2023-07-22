@@ -145,7 +145,7 @@ namespace HouseBuilder.Editor.Views
 
             foreach (var palette in palettes)
             {
-                ModulePaletteVisualElement modulePalette = new ModulePaletteVisualElement(palette);
+                ModulePaletteEditingVisualElement modulePalette = new ModulePaletteEditingVisualElement(palette);
                 modulePalette.deleted += ModulePaletteDeleteCallback;
                 modulePaletteList.Add(modulePalette);
             }

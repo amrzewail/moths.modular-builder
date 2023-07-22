@@ -53,7 +53,7 @@ namespace HouseBuilder.Editor
 
             var dropdownIcon = new Label("v");
             dropdownIcon.style.width = Length.Percent(100);
-            dropdownIcon.style.unityTextAlign = TextAnchor.MiddleLeft;
+            dropdownIcon.style.unityTextAlign = TextAnchor.MiddleRight;
             dropdownIcon.style.marginLeft = 4;
             _button.Add(dropdownIcon);
         }

@@ -20,7 +20,7 @@ namespace HouseBuilder.Editor.Views
         private Tabs<Button> _tabs;
 
         private Tabs<Button> _heightTabs;
-        private Toggle _showAllLevels;
+        private ButtonToggle _showAllLevels;
 
         private VisualElement _newHouseView;
 
@@ -62,8 +62,8 @@ namespace HouseBuilder.Editor.Views
             _heightTabs.onTabClicked += HeightTabClickCallback;
             _heightTabs.AddToClassList("height-tabs-container");
 
-            _showAllLevels = new Toggle("Show all levels");
-            _showAllLevels.RegisterCallback<ChangeEvent<bool>>(ShowAllLevelsToggle);
+            _showAllLevels = new ButtonToggle("Show all levels");
+            _showAllLevels.changed += ShowAllLevelsToggle;
             _showAllLevels.AddToClassList("show-levels");
 
             //_header.Add(_levelTabs);
@@ -81,7 +81,7 @@ namespace HouseBuilder.Editor.Views
             _tabs = new Tabs<Button>(
                 new Button { text = "Placement" },
                 new Button { text = "Editing" },
-                new Button { text = "Palettes" });
+                new Button { text = "Edit Palettes" });
             _tabs.onTabClicked += TabClickCallback;
             _tabs.Click(0);
             _tabs.AddToClassList("edit-tabs");
@@ -100,14 +100,14 @@ namespace HouseBuilder.Editor.Views
 
         }
 
-        private void ShowAllLevelsToggle(ChangeEvent<bool> evt)
+        private bool ShowAllLevelsToggle(bool evt)
         {
             if (!_editor.IsHouseValid)
             {
-                evt.PreventDefault();
-                return;
+                return false;
             }
             UpdateHouseVisibility();
+            return true;
         }
 
         private void HeightTabClickCallback(int index)
@@ -140,6 +140,8 @@ namespace HouseBuilder.Editor.Views
         private void UpdateVisualElements()
         {
             _body.Clear();
+
+            _editor.Previewer.Clean();
 
             switch (_tabs.Current)
             {
