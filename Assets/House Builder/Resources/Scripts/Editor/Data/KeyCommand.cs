@@ -18,5 +18,6 @@ namespace HouseBuilder.Editor
         HighlightDrag,
         HighlightClick,
         Extrude,
+        HighlightAll,
     }
 }

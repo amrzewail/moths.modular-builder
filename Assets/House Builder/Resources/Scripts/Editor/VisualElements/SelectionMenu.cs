@@ -67,12 +67,21 @@ namespace HouseBuilder.Editor
                 _button = new Button(OnButtonClick);
                 this.Add(_button);
             }
-            _button.text = GetName(sets[0]);
+            if (sets.Length > 0)
+            {
+                _button.text = GetName(sets[0]);
+            }
+            else
+            {
+                _button.text = "";
+            }
             _sets = sets;
         }
 
         void OnButtonClick()
         {
+            if (_sets == null) return;
+
             // create the menu and add items to it
             GenericMenu menu = new GenericMenu();
 

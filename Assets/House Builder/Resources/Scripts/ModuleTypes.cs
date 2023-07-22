@@ -9,6 +9,6 @@ namespace HouseBuilder.Data
     {
         [SerializeField] string[] _moduleTypes;
 
-        public string[] Types => _moduleTypes;
+        public string[] Types => _moduleTypes == null ? new string[0] : _moduleTypes;
     }
 }

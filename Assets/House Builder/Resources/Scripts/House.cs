@@ -26,22 +26,29 @@ namespace HouseBuilder
             _cellsPerLevel = Mathf.Max(1, _cellsPerLevel);
         }
 
+        [ContextMenu("Force Update Modules")]
+        private void ForceUpdateModulesList()
+        {
+            _allModules.Clear();
+            for (int i = 0; i < transform.childCount; i++)
+            {
+                Transform level = transform.GetChild(i);
+                for (int j = 0; j < level.childCount; j++)
+                {
+                    Transform moduleType = level.GetChild(j);
+                    for (int k = 0; k < moduleType.childCount; k++)
+                    {
+                        _allModules.Add(moduleType.GetChild(k).gameObject);
+                    }
+                }
+            }
+        }
+
         private void CheckUpdateModulesList()
         {
             if (_allModules.Count == 0)
             {
-                for (int i = 0; i < transform.childCount; i++)
-                {
-                    Transform level = transform.GetChild(i);
-                    for(int j = 0; j < level.childCount; j++)
-                    {
-                        Transform moduleType = level.GetChild(j);
-                        for (int k = 0; k < moduleType.childCount; k++)
-                        {
-                            _allModules.Add(moduleType.GetChild(k).gameObject);
-                        }
-                    }
-                }
+                ForceUpdateModulesList();
             }
         }
 
@@ -66,6 +73,17 @@ namespace HouseBuilder
             module.transform.SetParent(child, true);
 
             _allModules.Add(module);
+        }
+
+        public void Replace(GameObject oldExistingModule, GameObject newModule)
+        {
+            var parent = oldExistingModule.GetComponentInParent<IHouse>();
+            if (parent != (IHouse)this) return;
+            newModule.transform.SetParent(oldExistingModule.transform.parent);
+            newModule.transform.position = oldExistingModule.transform.position;
+            newModule.transform.rotation = oldExistingModule.transform.rotation;
+            newModule.transform.localScale = oldExistingModule.transform.localScale;
+            _allModules.Add(newModule);
         }
 
         public GameObject GetFirstByQuery(Func<GameObject, bool> query)
@@ -166,6 +184,18 @@ namespace HouseBuilder
                 }
             }
             return list;
+        }
+
+        public string GetModuleType(GameObject g)
+        {
+            return g.transform.parent.name;
+        }
+
+        public int GetModuleLevel(Vector3 position)
+        {
+            var levelIndex = position.y / (gridSize.y * gridsPerLevel);
+            if (1f - levelIndex % 1f < 0.01f) return Mathf.CeilToInt(levelIndex);
+            else return Mathf.FloorToInt(levelIndex);
         }
     }
 }

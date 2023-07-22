@@ -23,9 +23,9 @@ namespace HouseBuilder.Editor.Controllers
             _alignedOutliner = new Outliner(editor);
         }
 
-        private bool CheckForDuplication(Vector3 position, Vector3 eulerAngles, GameObject prefab)
+        private bool CheckForDuplication(Vector3 position, Vector3 eulerAngles, string moduleType, int levelIndex, GameObject prefab)
         {
-            List<GameObject> currentPlacedElements = _editor.House.GetAtPosition(_editor.Palettes.CurrentModuleType, _editor.Grid.CurrentLevelIndex, position, _editor.Grid.gridSize.magnitude / 4f);
+            List<GameObject> currentPlacedElements = _editor.House.GetAtPosition(moduleType, levelIndex, position, _editor.Grid.gridSize.magnitude / 4f);
             bool isDuplicated;
             foreach(var currentPlacedElement in currentPlacedElements)
             {
@@ -59,7 +59,7 @@ namespace HouseBuilder.Editor.Controllers
         private GameObject InstantiatePreviewPrefab()
         {
             if (_editor.Previewer.Prefab == null) return null;
-            GameObject module = InstantiatePrefab(_editor.Previewer.Prefab);
+            GameObject module = InstantiatePrefab(_editor.Previewer.Prefab, _editor.Palettes.CurrentModuleType, _editor.Grid.CurrentLevelIndex);
             module.name = _editor.Previewer.Prefab.name;
             module.transform.position = _editor.Previewer.position;
             module.transform.eulerAngles = _editor.Previewer.eulerAngles;
@@ -68,11 +68,11 @@ namespace HouseBuilder.Editor.Controllers
             return module;
         }
 
-        private GameObject InstantiatePrefab(GameObject prefab)
+        private GameObject InstantiatePrefab(GameObject prefab, string moduleType, int levelIndex)
         {
             GameObject module = (GameObject)PrefabUtility.InstantiatePrefab(prefab);
             module.name = prefab.name;
-            _editor.House.Add(_editor.Palettes.CurrentModuleType, _editor.Grid.CurrentLevelIndex, module);
+            _editor.House.Add(moduleType, levelIndex, module);
             Undo.RegisterCreatedObjectUndo(module, "Created module object");
             return module;
         }
@@ -131,9 +131,12 @@ namespace HouseBuilder.Editor.Controllers
                 Vector3 position = g.transform.position;
                 position.y += _editor.Grid.gridSize.y;
 
-                if (CheckForDuplication(position, g.transform.eulerAngles, prefab)) continue;
+                int levelIndex = _editor.House.GetModuleLevel(position);
+                string moduleType = _editor.House.GetModuleType(g);
 
-                prefab = InstantiatePrefab(prefab);
+                if (CheckForDuplication(position, g.transform.eulerAngles, moduleType, levelIndex, prefab)) continue;
+
+                prefab = InstantiatePrefab(prefab, moduleType, levelIndex);
                 prefab.transform.position = position;
                 prefab.transform.rotation = g.transform.rotation;
                 prefab.transform.localScale = g.transform.localScale;
@@ -143,6 +146,31 @@ namespace HouseBuilder.Editor.Controllers
             }
 
             _editor.Logger.Log(nameof(SceneEditor), "Attempted extrude height.");
+        }
+
+        public void ReplaceSelectionWith(GameObject prefab)
+        {
+            if (!prefab) return;
+
+            var selections = _editor.Selector.CurrentMultiple;
+            if (selections.Count == 0) return;
+
+            var newModules = new List<GameObject>();
+            foreach (var g in selections)
+            {
+                GameObject module = (GameObject)PrefabUtility.InstantiatePrefab(prefab);
+                module.name = prefab.name;
+                _editor.House.Replace(g, module);
+                Undo.RegisterCreatedObjectUndo(module, "Replaced module object");
+                newModules.Add(module);
+                DestroyGameObject(g);
+            }
+            _editor.Selector.Clear();
+            foreach(var g in newModules)
+            {
+                _editor.Selector.Select(g);
+            }
+            _editor.Logger.Log(nameof(SceneEditor), $"Attempted replace with {prefab.name}");
         }
 
         public void OnSceneGUI(SceneView view)
@@ -191,10 +219,16 @@ namespace HouseBuilder.Editor.Controllers
                     //}
                     break;
 
+                case KeyCommand.HighlightAll:
+
+
+
+                    break;
+
                 case KeyCommand.LeftMouseButtonUp:
                     if (_editor.Previewer.Prefab)
                     {
-                        if (!CheckForDuplication(_editor.Previewer.position, _editor.Previewer.eulerAngles, _editor.Previewer.Prefab))
+                        if (!CheckForDuplication(_editor.Previewer.position, _editor.Previewer.eulerAngles, _editor.Palettes.CurrentModuleType, _editor.Grid.CurrentLevelIndex, _editor.Previewer.Prefab))
                         {
                             _editor.Selector.Clear();
                             GameObject module = InstantiatePreviewPrefab();

@@ -15,3 +15,4 @@ MonoBehaviour:
   _type: Floor
   _prefabs:
   - {fileID: 7185106036931571147, guid: cb72c0d57a49d7e46b0ef62cc15d9ee4, type: 3}
+  - {fileID: 6583502311905398729, guid: 111c76ee4f558ec488ddaf7f6339027a, type: 3}

@@ -16,6 +16,9 @@ namespace HouseBuilder.Editor.Views
 
         private SelectionMenu<PaletteSet> _paletteSetSelection;
         private Label _transformLabel;
+
+        private Label _warningLabel;
+
         private VisualElement _modulePalettesList;
 
         public PlacementView(IEditor editor)
@@ -41,8 +44,9 @@ namespace HouseBuilder.Editor.Views
                 "Alt + Scroll wheel: Rotate module\n" +
                 "Alt + RMB: Flip module x-axis\n" +
                 "Ctrl + LMB: Select modules\n" +
+                "Ctrl + Shift + LMB: Select all of prefab type\n" +
                 "Backspace: Delete selected\n" +
-                "E: Extrude selected up\n" +
+                "Ctrl + E: Extrude selected up\n" +
                 "Esc: Clear selections\n" +
                 "";
             shortcuts.AddToClassList("shortcuts-label");
@@ -59,7 +63,7 @@ namespace HouseBuilder.Editor.Views
             _paletteSetSelection = new SelectionMenu<PaletteSet>("Palette Set");
             _paletteSetSelection.style.flexGrow = 1;
             _paletteSetSelection.onSelected += PaletteSetSelectCallback;
-            _paletteSetSelection.isItemDisabled += (paletteSet) => paletteSet.Palettes.Length == 0;
+            //_paletteSetSelection.isItemDisabled += (paletteSet) => paletteSet.Palettes == null || paletteSet.Palettes.Length == 0;
 
             paletteSetAndModuleTypeHorizontal.Add(_paletteSetSelection);
 
@@ -76,43 +80,53 @@ namespace HouseBuilder.Editor.Views
             _modulePalettesList.AddToClassList("placement-palette-list");
             this.Add(_modulePalettesList);
 
-            //_modulePalette = new VisualElement();
-            //_modulePalette.AddToClassList("module-palette-element");
-            //this.Add(_modulePalette);
 
-            //_prefabsTabs = new Tabs<PrefabButtonVisualElement>();
-            //_prefabsTabs.AddToClassList("prefabs-tabs");
-            //_prefabsTabs.onTabClicked += PrefabButtonCallback;
-            //_modulePalette.Add(_prefabsTabs);
+            _warningLabel = new Label();
+            _warningLabel.AddToClassList("no-palette-sets-label");
         }
 
 
         public void Refresh()
         {
+            if (this.Contains(_warningLabel)) this.Remove(_warningLabel);
+
             if (_editor.Palettes.LoadPaletteSets())
             {
                 _paletteSetSelection.Refresh(_editor.Palettes.PaletteSets, x => x.name);
                 _paletteSetSelection.Select(_editor.Palettes.CurrentPaletteSet);
 
                 UpdateModuleTypeList();
-                
+            }
+            else
+            {
+                _warningLabel.text = "No PalleteSets found in Editor/Resources.\nGo to <b>Edit Palettes</b> tab to create a new PaletteSet.";
+                this.Add(_warningLabel);
             }
         }
 
         private void UpdateModuleTypeList()
         {
+            if (this.Contains(_warningLabel)) this.Remove(_warningLabel);
+
             _modulePalettesList.Clear();
             _palettesElements.Clear();
 
             var currentSet = _editor.Palettes.CurrentPaletteSet;
-            if (currentSet.Palettes == null) return;
+            if (currentSet.Palettes == null || currentSet.Palettes.Length == 0)
+            {
 
+                _warningLabel.text = $"<i>{currentSet.name}</i> is empty.\n\nGo to <b>Edit Palettes</b> tab then click <b>Edit</b> next to this PalleteSet to add new palettes to <i>{currentSet.name}</i>.";
+                this.Add(_warningLabel);
+                _editor.Logger.Error(nameof(PlacementView), $"The current selected palette set is empty.");
+                return;
+            }
 
             foreach (var palette in currentSet.Palettes)
             {
                 ModulePalettePlacementVisualElement modulePaletteVE = new ModulePalettePlacementVisualElement(palette);
                 _modulePalettesList.Add(modulePaletteVE);
                 modulePaletteVE.selected += (type, prefab) => ModuleSelectedCallback(modulePaletteVE, type, prefab);
+                modulePaletteVE.replace += (type, prefab) => ModuleReplaceCallback(modulePaletteVE, type, prefab);
                 _palettesElements.Add(modulePaletteVE);
             }
 
@@ -144,6 +158,13 @@ namespace HouseBuilder.Editor.Views
                 if (p == element) continue;
                 p.ClearSelection();
             }
+        }
+
+
+        private void ModuleReplaceCallback(ModulePalettePlacementVisualElement modulePaletteVE, string type, GameObject prefab)
+        {
+            _editor.SceneEditor.ReplaceSelectionWith(prefab);
+
         }
 
 

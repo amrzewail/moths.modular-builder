@@ -67,6 +67,23 @@ namespace HouseBuilder.Editor.Controllers
             _editor.Logger.Log(nameof(ModuleObjectSelector), $"Unhighlight gameobject {g.name}");
         }
 
+        public void SelectAll(GameObject g)
+        {
+            if (!isEnabled) return;
+            if (!_editor.IsHouseValid) return;
+
+            GameObject prefab = PrefabUtility.GetCorrespondingObjectFromSource(g);
+            List<GameObject> selection = _editor.House.GetByQuery(x => PrefabUtility.GetCorrespondingObjectFromSource(x) == prefab);
+            foreach(var s in selection)
+            {
+                if (CurrentMultiple.Contains(s)) continue;
+                CurrentMultiple.Add(s);
+                _editor.Outliner.AddGameObject(s, selectionColor);
+            }
+
+            _editor.Logger.Log(nameof(ModuleObjectSelector), $"Highlight all gameobjects {g.name}");
+        }
+
         private void SceneGUI(SceneView view)
         {
 
@@ -80,7 +97,7 @@ namespace HouseBuilder.Editor.Controllers
             }
 
             GameObject selectedGameObject;
-
+            bool canSelect;
 
             if (Event.current.type == EventType.MouseDown && Event.current.button == 0)
             {
@@ -98,7 +115,8 @@ namespace HouseBuilder.Editor.Controllers
                 case KeyCommand.HighlightDrag:
 
                     selectedGameObject = HandleUtility.PickGameObject(_editor.Input.MousePosition, true);
-                    if (selectedGameObject && selectedGameObject != _lastDraggedGameObject)
+                    canSelect = CanSelectObject(selectedGameObject);
+                    if (selectedGameObject && canSelect && selectedGameObject != _lastDraggedGameObject)
                     {
                         if (!CurrentMultiple.Contains(selectedGameObject))
                         {
@@ -122,7 +140,7 @@ namespace HouseBuilder.Editor.Controllers
                 case KeyCommand.HighlightClick:
 
                     selectedGameObject = HandleUtility.PickGameObject(_editor.Input.MousePosition, true);
-                    bool canSelect = CanSelectObject(selectedGameObject);
+                    canSelect = CanSelectObject(selectedGameObject);
                     if (!selectedGameObject || !canSelect)
                     {
                         Clear();
@@ -139,6 +157,19 @@ namespace HouseBuilder.Editor.Controllers
                             Select(selectedGameObject);
                         }
                     }
+
+                    break;
+
+                case KeyCommand.HighlightAll:
+                    selectedGameObject = HandleUtility.PickGameObject(_editor.Input.MousePosition, true);
+                    canSelect = CanSelectObject(selectedGameObject);
+                    if (!selectedGameObject || !canSelect)
+                    {
+                        Clear();
+                        break;
+                    }
+
+                    SelectAll(selectedGameObject);
 
                     break;
 

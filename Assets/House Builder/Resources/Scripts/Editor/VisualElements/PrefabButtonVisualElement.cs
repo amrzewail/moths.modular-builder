@@ -15,6 +15,7 @@ namespace HouseBuilder.Editor
         public GameObject prefab => _targetPrefab;
 
         public new event Action<GameObject> clicked;
+        public event Action<GameObject> replace;
 
         public PrefabButtonVisualElement(GameObject prefab)
         {
@@ -41,6 +42,7 @@ namespace HouseBuilder.Editor
         {
             Debug.Log($"{nameof(PrefabButtonVisualElement)} Replace click callback");
             evt.StopPropagation();
+            replace?.Invoke(prefab);
         }
 
 

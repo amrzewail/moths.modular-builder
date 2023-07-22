@@ -13,7 +13,8 @@ namespace HouseBuilder
             List<string> _availableTypes = new List<string>();
             foreach (var moduleTypes in moduleTypesAll)
             {
-                foreach (var type in moduleTypes.Types)
+                var types = moduleTypes.Types;
+                foreach (var type in types)
                 {
                     if (_availableTypes.Contains(type)) continue;
                     _availableTypes.Add(type);

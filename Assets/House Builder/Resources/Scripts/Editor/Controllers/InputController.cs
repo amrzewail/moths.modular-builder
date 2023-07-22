@@ -26,7 +26,7 @@ namespace HouseBuilder.Editor.Controllers
 
             MousePosition = Event.current.mousePosition;
 
-            if (Event.current.type == EventType.KeyDown && Event.current.keyCode == KeyCode.E && !Event.current.control && !Event.current.alt)
+            if (Event.current.type == EventType.KeyDown && Event.current.keyCode == KeyCode.E && Event.current.control && !Event.current.alt)
             {
                 Command = KeyCommand.Extrude;
                 return;
@@ -42,6 +42,12 @@ namespace HouseBuilder.Editor.Controllers
             {
                 Command = KeyCommand.Frame;
                 Event.current.Use();
+                return;
+            }
+
+            if (Event.current.type == EventType.MouseUp && Event.current.button == 0 && Event.current.control && Event.current.shift && !Event.current.alt)
+            {
+                Command = KeyCommand.HighlightAll;
                 return;
             }
 

@@ -18,6 +18,8 @@ namespace HouseBuilder
 
         void Add(string type, int level, GameObject module);
 
+        void Replace(GameObject oldExistingModule, GameObject newModule);
+
         GameObject GetFirstByQuery(Func<GameObject, bool> query);
         List<GameObject> GetByQuery(Func<GameObject, bool> query);
         List<GameObject> GetAtPosition(string type, int level, Vector3 worldPosition, float precision);
@@ -27,5 +29,9 @@ namespace HouseBuilder
         void ShowAllLevels();
 
         List<GameObject> GetAllAtHeight(string type, int level, int heightIndex);
+
+        string GetModuleType(GameObject g);
+
+        int GetModuleLevel(Vector3 position);
     }
 }

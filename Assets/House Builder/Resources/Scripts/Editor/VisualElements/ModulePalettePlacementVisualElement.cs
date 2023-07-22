@@ -18,6 +18,7 @@ namespace HouseBuilder.Editor
         private Tabs<PrefabButtonVisualElement> _tabs = new Tabs<PrefabButtonVisualElement>();
 
         public event Action<string, GameObject> selected;
+        public Action<string, GameObject> replace;
 
         public ModulePalettePlacementVisualElement(ModulePalette palette)
         {
@@ -48,6 +49,7 @@ namespace HouseBuilder.Editor
             {
                 var prefabVE = new PrefabButtonVisualElement(prefab);
                 prefabVE.AddToClassList("prefab-tab");
+                prefabVE.replace += ReplacePrefabCallback;
                 _tabs.AddTab(prefabVE, -1);
                 i++;
             }
@@ -58,6 +60,11 @@ namespace HouseBuilder.Editor
                 _isExpanded = _paletteExpands[_palette];
             }
             UpdateExpandVisuals();
+        }
+
+        private void ReplacePrefabCallback(GameObject g)
+        {
+            replace?.Invoke(_palette.Type, g);
         }
 
         private void ExpandClickCallback()

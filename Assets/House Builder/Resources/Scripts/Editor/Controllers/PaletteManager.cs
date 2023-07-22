@@ -33,6 +33,7 @@ namespace HouseBuilder.Editor.Controllers
             {
                 if (_currentPaletteSet == value) return;
                 _currentPaletteSet = value;
+                if (_currentPaletteSet == null) return;
                 _logger.Log(nameof(PaletteManager), $"Changed palette set to {_currentPaletteSet.name}");
 
             }
@@ -53,6 +54,10 @@ namespace HouseBuilder.Editor.Controllers
                 IsLoaded = true;
                 _logger.Log(nameof(PaletteManager), "Palette sets loaded successfully.");
                 return true;
+            }
+            else
+            {
+                CurrentPaletteSet = null;
             }
             _logger.Error(nameof(PaletteManager), "No palette sets found in Resources.");
             return false;

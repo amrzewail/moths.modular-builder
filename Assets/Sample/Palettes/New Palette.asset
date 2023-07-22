@@ -12,6 +12,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 97dd6ad12300bef4890188b3c1c77de1, type: 3}
   m_Name: New Palette
   m_EditorClassIdentifier: 
-  _type: Wall
+  _type: Decoration
   _prefabs:
-  - {fileID: 9181583271569379300, guid: 6b3ddfcdf72c02e49bd8a2862a67d1ef, type: 3}
+  - {fileID: 8570744648215451435, guid: ed9cf56e6db3b3548b581b499dae6855, type: 3}
+  - {fileID: 8230715906394833187, guid: 6c0da139c09760f498e09db273aa6a0a, type: 3}
+  - {fileID: 8958757195805156369, guid: 55da05c02c9daee41a973b0577777781, type: 3}
