@@ -1,3 +1,4 @@
+using HouseBuilder.Editor.Data;
 using System;
 using System.Collections;
 using System.Collections.Generic;
@@ -112,49 +113,50 @@ namespace HouseBuilder.Editor.Controllers
 
             switch (_editor.Input.Command)
             {
-                case KeyCommand.HighlightDrag:
+                case KeyCommand.Highlight:
 
-                    selectedGameObject = HandleUtility.PickGameObject(_editor.Input.MousePosition, true);
-                    canSelect = CanSelectObject(selectedGameObject);
-                    if (selectedGameObject && canSelect && selectedGameObject != _lastDraggedGameObject)
+                    if (_editor.Input.IsDragging)
                     {
-                        if (!CurrentMultiple.Contains(selectedGameObject))
+                        selectedGameObject = HandleUtility.PickGameObject(_editor.Input.MousePosition, true);
+                        canSelect = CanSelectObject(selectedGameObject);
+                        if (selectedGameObject && canSelect && selectedGameObject != _lastDraggedGameObject)
                         {
-                            if (CanSelectObject(selectedGameObject))
+                            if (!CurrentMultiple.Contains(selectedGameObject))
+                            {
+                                if (CanSelectObject(selectedGameObject))
+                                {
+                                    Select(selectedGameObject);
+                                    _lastSelectedGameObject = selectedGameObject;
+                                }
+                            }
+                            else if (_lastSelectedGameObject != selectedGameObject)
+                            {
+                                Unselect(selectedGameObject);
+                                _lastSelectedGameObject = null;
+                            }
+                            _lastDraggedGameObject = selectedGameObject;
+                            _mouseDownObject = null;
+                        }
+                    }
+                    else
+                    {
+                        selectedGameObject = HandleUtility.PickGameObject(_editor.Input.MousePosition, true);
+                        canSelect = CanSelectObject(selectedGameObject);
+                        if (!selectedGameObject || !canSelect)
+                        {
+                            Clear();
+                            break;
+                        }
+                        if (selectedGameObject && _mouseDownObject == selectedGameObject)
+                        {
+                            if (CurrentMultiple.Contains(selectedGameObject))
+                            {
+                                Unselect(selectedGameObject);
+                            }
+                            else if (canSelect)
                             {
                                 Select(selectedGameObject);
-                                _lastSelectedGameObject = selectedGameObject;
                             }
-                        }
-                        else if (_lastSelectedGameObject != selectedGameObject)
-                        {
-                            Unselect(selectedGameObject);
-                            _lastSelectedGameObject = null;
-                        }
-                        _lastDraggedGameObject = selectedGameObject;
-                        _mouseDownObject = null;
-                    }
-
-                    break;
-
-                case KeyCommand.HighlightClick:
-
-                    selectedGameObject = HandleUtility.PickGameObject(_editor.Input.MousePosition, true);
-                    canSelect = CanSelectObject(selectedGameObject);
-                    if (!selectedGameObject || !canSelect)
-                    {
-                        Clear();
-                        break;
-                    }
-                    if (selectedGameObject && _mouseDownObject == selectedGameObject)
-                    {
-                        if (CurrentMultiple.Contains(selectedGameObject))
-                        {
-                            Unselect(selectedGameObject);
-                        }
-                        else if (canSelect)
-                        {
-                            Select(selectedGameObject);
                         }
                     }
 

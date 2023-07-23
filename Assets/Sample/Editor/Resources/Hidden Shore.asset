@@ -13,4 +13,7 @@ MonoBehaviour:
   m_Name: Hidden Shore
   m_EditorClassIdentifier: 
   <Palettes>k__BackingField:
+  - {fileID: 11400000, guid: 1169e42b3062669449e2625979b82dd3, type: 2}
+  - {fileID: 11400000, guid: de35a4048a4fb964fa564005b963fd42, type: 2}
+  - {fileID: 11400000, guid: 21c068bee2e19b441915ee0f900785d2, type: 2}
   - {fileID: 11400000, guid: 5fce9eff8fc25a8448e0154b41df31d7, type: 2}

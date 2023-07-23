@@ -1,3 +1,4 @@
+using HouseBuilder.Editor.Data;
 using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
@@ -207,25 +208,12 @@ namespace HouseBuilder.Editor.Controllers
 
                     break;
 
-                case KeyCommand.UnselectedPrefab:
+                case KeyCommand.UnselectPrefab:
                     _editor.Previewer.Clean();
                     _editor.Selector.Clear();
                     break;
 
-                case KeyCommand.HighlightClick:
-                    //if (_editor.Previewer.Prefab)
-                    //{
-                    //    _editor.Previewer.Clean();
-                    //}
-                    break;
-
-                case KeyCommand.HighlightAll:
-
-
-
-                    break;
-
-                case KeyCommand.LeftMouseButtonUp:
+                case KeyCommand.Place:
                     if (_editor.Previewer.Prefab)
                     {
                         if (!CheckForDuplication(_editor.Previewer.position, _editor.Previewer.eulerAngles, _editor.Palettes.CurrentModuleType, _editor.Grid.CurrentLevelIndex, _editor.Previewer.Prefab))
@@ -236,7 +224,7 @@ namespace HouseBuilder.Editor.Controllers
                     }
                     break;
 
-                case KeyCommand.PrepareHighlight:
+                case KeyCommand.HidePreview:
                     _editor.Previewer.Hide();
                     break;
 
@@ -275,7 +263,7 @@ namespace HouseBuilder.Editor.Controllers
                     }
                     break;
 
-                case KeyCommand.ChangeHeight:
+                case KeyCommand.AdjustHeight:
                     _editor.Grid.totalHeightIndex += _editor.Input.ScrollWheel;
 
                     _editor.Logger.Log(nameof(SceneEditor), $"Change grid height {_editor.Grid.totalHeightIndex}");
