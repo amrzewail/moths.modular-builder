@@ -12,5 +12,7 @@ namespace HouseBuilder.Editor.Controllers
         void ExtrudeHeight();
 
         void ReplaceSelectionWith(GameObject prefab);
+
+        void AddPrefabToSelection(GameObject prefab);
     }
 }

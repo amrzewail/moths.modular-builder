@@ -350,12 +350,28 @@ Label
 	transition-property: translate;
 	translate: 0px 100px;
 	transition-timing-function: ease-out;
+	height: 20px;
+}
+
+.placement-palette-list .prefabs-tabs .prefab-add-btn
+{
+	height: 20px;
+	position: absolute;
+	align-self: center;
+	transition-duration: 0.15s;
+	transition-property: translate;
+	translate: 0px 100px;
+	transition-timing-function: ease-out;
 }
 
 .placement-palette-list .prefabs-tabs .tab:hover .prefab-replace-btn
 {
 	translate: 0px 70px;
-	height: 20px;
+}
+
+.placement-palette-list .prefabs-tabs .tab:hover .prefab-add-btn
+{
+	translate: 0px 50px;
 }
 
 .placement-palette-list .prefabs-tabs .tabs .tab

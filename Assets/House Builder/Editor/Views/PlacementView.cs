@@ -20,6 +20,7 @@ namespace HouseBuilder.Editor.Views
         private Label _warningLabel;
 
         private VisualElement _modulePalettesList;
+        private int _lastSelectionCount = -1;
 
         public PlacementView(IEditor editor)
         {
@@ -134,6 +135,8 @@ namespace HouseBuilder.Editor.Views
                 _modulePalettesList.Add(modulePaletteVE);
                 modulePaletteVE.selected += (type, prefab) => ModuleSelectedCallback(modulePaletteVE, type, prefab);
                 modulePaletteVE.replace += (type, prefab) => ModuleReplaceCallback(modulePaletteVE, type, prefab);
+                modulePaletteVE.add += (type, prefab) => ModuleAddCallback(modulePaletteVE, type, prefab);
+
                 _palettesElements.Add(modulePaletteVE);
             }
 
@@ -173,13 +176,26 @@ namespace HouseBuilder.Editor.Views
             _editor.SceneEditor.ReplaceSelectionWith(prefab);
 
         }
+        private void ModuleAddCallback(ModulePalettePlacementVisualElement modulePaletteVE, string type, GameObject prefab)
+        {
+            _editor.SceneEditor.AddPrefabToSelection(prefab);
 
+        }
 
         private void Update()
         {
             float rotationY = _editor.Previewer.eulerAngles.y;
             rotationY -= _editor.Grid.rotation.eulerAngles.y;
             _transformLabel.text = $"Rotation: {Mathf.RoundToInt(rotationY)} {(_editor.Previewer.localScale.x < 0 ? "Flipped" : "")}\n";
+
+            if (_lastSelectionCount != _editor.Selector.CurrentMultiple.Count)
+            {
+                foreach(var element in _palettesElements)
+                {
+                    element.SetHoverElementsVisibility(_editor.Selector.CurrentMultiple.Count > 0);
+                }
+                _lastSelectionCount = _editor.Selector.CurrentMultiple.Count;
+            }
         }
     }
 }

@@ -15,7 +15,11 @@ namespace HouseBuilder.Editor
         public GameObject prefab => _targetPrefab;
 
         public new event Action<GameObject> clicked;
+
+        public event Action<GameObject> add;
         public event Action<GameObject> replace;
+
+        public List<VisualElement> onHoverElements = new List<VisualElement>();
 
         public PrefabButtonVisualElement(GameObject prefab)
         {
@@ -32,6 +36,14 @@ namespace HouseBuilder.Editor
             replaceButton.RegisterCallback<ClickEvent>(ReplaceClickCallback);
             replaceButton.AddToClassList("prefab-replace-btn");
             this.Add(replaceButton);
+            onHoverElements.Add(replaceButton);
+
+            var addButton = new Button();
+            addButton.text = "Add";
+            addButton.RegisterCallback<ClickEvent>(AddClickCallback);
+            addButton.AddToClassList("prefab-add-btn");
+            this.Add(addButton);
+            onHoverElements.Add(addButton);
 
             base.clicked += ClickCallback;
 
@@ -40,9 +52,14 @@ namespace HouseBuilder.Editor
 
         private void ReplaceClickCallback(ClickEvent evt)
         {
-            Debug.Log($"{nameof(PrefabButtonVisualElement)} Replace click callback");
             evt.StopPropagation();
             replace?.Invoke(prefab);
+        }
+
+        private void AddClickCallback(ClickEvent evt)
+        {
+            evt.StopPropagation();
+            add?.Invoke(prefab);
         }
 
 

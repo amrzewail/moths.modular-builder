@@ -174,6 +174,33 @@ namespace HouseBuilder.Editor.Controllers
             _editor.Logger.Log(nameof(SceneEditor), $"Attempted replace with {prefab.name}");
         }
 
+        public void AddPrefabToSelection(GameObject prefab)
+        {
+            if (!prefab) return;
+
+            var selections = _editor.Selector.CurrentMultiple;
+            if (selections.Count == 0) return;
+
+            var newModules = new List<GameObject>();
+            foreach (var g in selections)
+            {
+                GameObject module = (GameObject)PrefabUtility.InstantiatePrefab(prefab);
+                module.name = prefab.name;
+                module.transform.position = g.transform.position;
+                module.transform.rotation = g.transform.rotation;
+                module.transform.localScale = g.transform.localScale;
+                _editor.House.Add(_editor.House.GetModuleType(g), _editor.House.GetModuleLevel(g.transform.position), module);
+                Undo.RegisterCreatedObjectUndo(module, "Replaced module object");
+                newModules.Add(module);
+            }
+            _editor.Selector.Clear();
+            foreach (var g in newModules)
+            {
+                _editor.Selector.Select(g);
+            }
+            _editor.Logger.Log(nameof(SceneEditor), $"Attempted add with {prefab.name}");
+        }
+
         public void OnSceneGUI(SceneView view)
         {
             _alignedOutliner.Cleanup();

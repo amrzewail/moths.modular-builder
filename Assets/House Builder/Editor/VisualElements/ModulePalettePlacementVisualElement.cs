@@ -14,11 +14,12 @@ namespace HouseBuilder.Editor
         private ModulePalette _palette;
 
         private VisualElement _header;
-        private Button _expandBtn;
         private Tabs<PrefabButtonVisualElement> _tabs = new Tabs<PrefabButtonVisualElement>();
+        private List<PrefabButtonVisualElement> _tabsList = new List<PrefabButtonVisualElement>();
 
         public event Action<string, GameObject> selected;
         public Action<string, GameObject> replace;
+        public Action<string, GameObject> add;
 
         public ModulePalettePlacementVisualElement(ModulePalette palette)
         {
@@ -39,6 +40,7 @@ namespace HouseBuilder.Editor
 
             _header.Add(titleBtn);
 
+            _tabsList.Clear();
             _tabs = new Tabs<PrefabButtonVisualElement>();
             _tabs.AddToClassList("prefabs-tabs");
             _tabs.onTabClicked += index => PrefabButtonCallback(palette.Type, index);
@@ -50,7 +52,9 @@ namespace HouseBuilder.Editor
                 var prefabVE = new PrefabButtonVisualElement(prefab);
                 prefabVE.AddToClassList("prefab-tab");
                 prefabVE.replace += ReplacePrefabCallback;
+                prefabVE.add += AddPrefabCallback;
                 _tabs.AddTab(prefabVE, -1);
+                _tabsList.Add(prefabVE);
                 i++;
             }
 
@@ -65,6 +69,11 @@ namespace HouseBuilder.Editor
         private void ReplacePrefabCallback(GameObject g)
         {
             replace?.Invoke(_palette.Type, g);
+        }
+
+        private void AddPrefabCallback(GameObject g)
+        {
+            add?.Invoke(_palette.Type, g);
         }
 
         private void ExpandClickCallback()
@@ -93,5 +102,13 @@ namespace HouseBuilder.Editor
         }
 
         public void ClearSelection() => _tabs.ClearSelection();
+
+        public void SetHoverElementsVisibility(bool visibility)
+        {
+            foreach(var tab in _tabsList)
+            {
+                foreach (var element in tab.onHoverElements) element.style.visibility = visibility ? Visibility.Visible : Visibility.Hidden;
+            }
+        }
     }
 }

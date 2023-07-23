@@ -210,8 +210,7 @@ namespace HouseBuilder.Editor.Controllers
         private readonly ILogger _logger;
 
         private KeyClick _keyClick;
-        private MouseClick _leftClick;
-        private MouseClick _rightClick;
+        private Dictionary<KeyCommand, MouseClick[]> _mouseClicks = new Dictionary<KeyCommand, MouseClick[]>();
         private Dictionary<InputContext, Keymap> _keymaps;
         private KeyCommand _lastCommand;
 
@@ -228,8 +227,6 @@ namespace HouseBuilder.Editor.Controllers
         {
             _logger = logger;
             _keyClick = new KeyClick(_logger);
-            _leftClick = new MouseClick(0, logger);
-            _rightClick = new MouseClick(1, logger);
 
             LoadKeymaps();
         }
@@ -274,14 +271,24 @@ namespace HouseBuilder.Editor.Controllers
             MousePosition = Event.current.mousePosition;
 
             _keyClick.Update(Event.current);
-            _leftClick.Update(Event.current);
-            _rightClick.Update(Event.current);
+            foreach(var mouse in _mouseClicks)
+            {
+                foreach (var click in mouse.Value) click.Update(Event.current);
+            }
             
             if (!_keymaps.ContainsKey(_context)) return;
 
             var keymap = _keymaps[_context];
             foreach (var binding in keymap.bindings)
             {
+                if (!_mouseClicks.ContainsKey(binding.Command))
+                {
+                    _mouseClicks[binding.Command] = new MouseClick[3];
+                    _mouseClicks[binding.Command][0] = new MouseClick(0, _logger);
+                    _mouseClicks[binding.Command][1] = new MouseClick(1, _logger);
+                    _mouseClicks[binding.Command][2] = new MouseClick(2, _logger);
+                }
+
                 if (ProcessBinding(binding))
                 {
                     Command = binding.Command;
@@ -303,8 +310,13 @@ namespace HouseBuilder.Editor.Controllers
             bool isShift = Event.current.shift == binding.Shift;
             bool isCtrl = Event.current.control == binding.Ctrl;
 
-            if (!isAlt || !isShift || !isCtrl) return false;
-
+            if (!isAlt || !isShift || !isCtrl)
+            {
+                _mouseClicks[binding.Command][0].Cancel();
+                _mouseClicks[binding.Command][1].Cancel();
+                _mouseClicks[binding.Command][2].Cancel();
+                return false;
+            }
             bool isKey = true;
 
             if (binding.Key != KeyCode.None)
@@ -331,20 +343,20 @@ namespace HouseBuilder.Editor.Controllers
             {
                 switch (Event.current.button)
                 {
-                    case 0: isMouseDrag = _leftClick.IsDrag(Event.current); break;
-                    case 1: isMouseDrag = _rightClick.IsDrag(Event.current); break;
+                    case 0: isMouseDrag = _mouseClicks[binding.Command][0].IsDrag(Event.current); break;
+                    case 1: isMouseDrag = _mouseClicks[binding.Command][1].IsDrag(Event.current); break;
                 }
 
                 switch (Event.current.button)
                 {
-                    case 0: isMouseClick = _leftClick.IsClick(Event.current); break;
-                    case 1: isMouseClick = _rightClick.IsClick(Event.current); break;
+                    case 0: isMouseClick = _mouseClicks[binding.Command][0].IsClick(Event.current); break;
+                    case 1: isMouseClick = _mouseClicks[binding.Command][1].IsClick(Event.current); break;
                 }
 
                 switch (Event.current.button)
                 {
-                    case 0: isMouseDoubleClick = _leftClick.IsDoubleClick(); break;
-                    case 1: isMouseDoubleClick = _rightClick.IsDoubleClick(); break;
+                    case 0: isMouseDoubleClick = _mouseClicks[binding.Command][0].IsDoubleClick(); break;
+                    case 1: isMouseDoubleClick = _mouseClicks[binding.Command][1].IsDoubleClick(); break;
                 }
             }
 
