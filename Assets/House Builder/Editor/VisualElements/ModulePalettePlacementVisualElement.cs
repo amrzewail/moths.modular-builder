@@ -6,14 +6,12 @@ using UnityEngine.UIElements;
 
 namespace HouseBuilder.Editor
 {
-    public class ModulePalettePlacementVisualElement : VisualElement
+    public class ModulePalettePlacementVisualElement : ExpandableElement
     {
         private static Dictionary<ModulePalette, bool> _paletteExpands = new Dictionary<ModulePalette, bool>();
 
-        private bool _isExpanded = true;
         private ModulePalette _palette;
 
-        private VisualElement _header;
         private Tabs<PrefabButtonVisualElement> _tabs = new Tabs<PrefabButtonVisualElement>();
         private List<PrefabButtonVisualElement> _tabsList = new List<PrefabButtonVisualElement>();
 
@@ -21,7 +19,7 @@ namespace HouseBuilder.Editor
         public Action<string, GameObject> replace;
         public Action<string, GameObject> add;
 
-        public ModulePalettePlacementVisualElement(ModulePalette palette)
+        public ModulePalettePlacementVisualElement(ModulePalette palette) : base()
         {
             this.AddToClassList("module-type-element");
 
@@ -29,16 +27,7 @@ namespace HouseBuilder.Editor
 
             if (!palette) return;
 
-            _header = new VisualElement();
-            _header.AddToClassList("header");
-            this.Add(_header);
-
-            Button titleBtn = new Button();
-            titleBtn.AddToClassList("title-btn");
-            titleBtn.text = palette.Type;
-            titleBtn.clicked += ExpandClickCallback;
-
-            _header.Add(titleBtn);
+            title = palette.Type;
 
             _tabsList.Clear();
             _tabs = new Tabs<PrefabButtonVisualElement>();
@@ -58,12 +47,15 @@ namespace HouseBuilder.Editor
                 i++;
             }
 
+            this.expandableElement = _tabs;
+
+            bool isExpanded = true;
 
             if (_paletteExpands.ContainsKey(_palette))
             {
-                _isExpanded = _paletteExpands[_palette];
+                isExpanded = _paletteExpands[_palette];
             }
-            UpdateExpandVisuals();
+            UpdateExpand(isExpanded);
         }
 
         private void ReplacePrefabCallback(GameObject g)
@@ -76,29 +68,14 @@ namespace HouseBuilder.Editor
             add?.Invoke(_palette.Type, g);
         }
 
-        private void ExpandClickCallback()
-        {
-            _isExpanded = !_isExpanded;
-            _paletteExpands[_palette] = _isExpanded;
-
-            UpdateExpandVisuals();
-        }
-
-        private void UpdateExpandVisuals()
-        {
-            if (_isExpanded)
-            {
-                if (_tabs.ClassListContains("unexpanded")) _tabs.RemoveFromClassList("unexpanded");
-            }
-            else
-            {
-                if (!_tabs.ClassListContains("unexpanded"))  _tabs.AddToClassList("unexpanded");
-            }
-        }
-
         private void PrefabButtonCallback(string moduleType, int index)
         {
             selected?.Invoke(moduleType, _tabs.GetTab(index).prefab);
+        }
+
+        protected override void OnExpandUpdated()
+        {
+            _paletteExpands[_palette] = isExpanded;
         }
 
         public void ClearSelection() => _tabs.ClearSelection();

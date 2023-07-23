@@ -43,9 +43,8 @@ namespace HouseBuilder.Editor
             {
                 texture = AssetPreview.GetAssetPreview(obj);
                 if (texture == null) await System.Threading.Tasks.Task.Delay(100);
-                return texture;
             }
-            return null;
+            return texture;
         }
 
         public static void SaveAssetChanges(Object obj)

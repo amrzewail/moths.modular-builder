@@ -14,6 +14,7 @@ namespace HouseBuilder.Editor
         public event Action<int> onTabClicked;
 
         public int Current { get; private set; }
+        public T CurrentTab => _tabs[Current];
 
         public int TabsCount => _tabs.Count;
 
@@ -92,6 +93,7 @@ namespace HouseBuilder.Editor
 
         public void ClearTabs()
         {
+            ClearSelection();
             _tabs.Clear();
             _tabsContainer.Clear();
         }
@@ -130,9 +132,12 @@ namespace HouseBuilder.Editor
         public void ClearSelection()
         {
             if (Current < 0) return;
-            if (_tabs[Current].ClassListContains("selected"))
+            if (_tabs.Count > Current)
             {
-                _tabs[Current].RemoveFromClassList("selected");
+                if (_tabs[Current].ClassListContains("selected"))
+                {
+                    _tabs[Current].RemoveFromClassList("selected");
+                }
             }
             Current = -1;
         }

@@ -20,6 +20,9 @@ namespace HouseBuilder.Editor
         public event Func<T, bool> propertyChanged;
         public event Action create;
 
+        public ObjectField propertyField => _propertyField;
+        public Button deleteBtn => _deleteBtn;
+
         public string imageFallbackText { get => _previewLabel.text; set => _previewLabel.text = value; }
 
         public PropertyVisualElement(T obj)
@@ -109,6 +112,10 @@ namespace HouseBuilder.Editor
                 _obj = obj;
                 _propertyField.SetValueWithoutNotify(_obj);
                 UpdatePreview();
+            }
+            else
+            {
+                _propertyField.SetValueWithoutNotify(_obj);
             }
         }
 

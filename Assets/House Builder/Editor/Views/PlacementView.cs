@@ -48,15 +48,7 @@ namespace HouseBuilder.Editor.Views
                 shortcuts.text += binding.ToString();
                 shortcuts.text += "\n";
             }
-                //"LMB: Place modules\n" +
-                //"Alt + Scroll wheel: Rotate module\n" +
-                //"Alt + RMB: Flip module x-axis\n" +
-                //"Ctrl + LMB: Select modules\n" +
-                //"Ctrl + Shift + LMB: Select all of prefab type\n" +
-                //"Backspace: Delete selected\n" +
-                //"Ctrl + E: Extrude selected up\n" +
-                //"Esc: Clear selections\n" +
-                //"";
+
             shortcuts.AddToClassList("shortcuts-label");
             this.Add(shortcuts);
 
@@ -71,18 +63,10 @@ namespace HouseBuilder.Editor.Views
             _paletteSetSelection = new SelectionMenu<PaletteSet>("Palette Set");
             _paletteSetSelection.style.flexGrow = 1;
             _paletteSetSelection.onSelected += PaletteSetSelectCallback;
-            //_paletteSetSelection.isItemDisabled += (paletteSet) => paletteSet.Palettes == null || paletteSet.Palettes.Length == 0;
 
             paletteSetAndModuleTypeHorizontal.Add(_paletteSetSelection);
 
             this.Add(paletteSetAndModuleTypeHorizontal);
-
-
-            //var raiseButton = new Button();
-            //raiseButton.text = "Extrude Up";
-            //raiseButton.clicked += RaiseCallback;
-
-            //this.Add(raiseButton);
 
             _modulePalettesList = new VisualElement();
             _modulePalettesList.AddToClassList("placement-palette-list");

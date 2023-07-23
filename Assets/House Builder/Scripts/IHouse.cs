@@ -33,5 +33,13 @@ namespace HouseBuilder
         string GetModuleType(GameObject g);
 
         int GetModuleLevel(Vector3 position);
+
+        MeshRenderer[] GetModuleRenderers(GameObject module);
+
+        List<Material> GetAllModuleMaterials();
+
+        List<Material> GetModulesMaterials(List<GameObject> modules);
+
+        List<GameObject> GetAllModulesOfMaterial(Material material);
     }
 }

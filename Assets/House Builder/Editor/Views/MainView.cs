@@ -25,6 +25,7 @@ namespace HouseBuilder.Editor.Views
         private VisualElement _newHouseView;
 
         private PlacementView _placementView;
+        private EditingView _editingView;
         private PalettesView _palettesView;
 
         private int _lastHouseMaxHeightCount = 0;
@@ -75,6 +76,7 @@ namespace HouseBuilder.Editor.Views
             _newHouseView.AddToClassList("new-house-view");
 
             _placementView = new PlacementView(_editor);
+            _editingView = new EditingView(_editor);
             _palettesView = new PalettesView(_editor);
 
 
@@ -143,6 +145,7 @@ namespace HouseBuilder.Editor.Views
 
             _editor.Previewer.Clean();
 
+            _editingView.Close();
             switch (_tabs.Current)
             {
                 case 0:
@@ -157,8 +160,13 @@ namespace HouseBuilder.Editor.Views
                     return;
 
                 case 1:
-
-
+                    if (!_editor.IsHouseValid)
+                    {
+                        _body.Add(_newHouseView);
+                        return;
+                    }
+                    _body.Add(_editingView);
+                    _editingView.Refresh();
                     return;
 
                 case 2:

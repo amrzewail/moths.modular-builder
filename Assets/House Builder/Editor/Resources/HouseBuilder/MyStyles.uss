@@ -58,6 +58,15 @@
 	margin-right: 3px;
 }
 
+.editing-view
+{
+	background-color: var(--window-active-color);
+	height: 100%;
+	margin-left: 3px;
+	margin-right: 3px;
+	padding: 6px;
+}
+
 .new-house-view
 {
 	background-color: var(--window-active-color);
@@ -287,54 +296,6 @@ Label
 }
 
 
-.placement-palette-list .module-type-element .header
-{
-	display: flex;
-	flex-direction: row;
-	justify-content: space-between;
-	flex-wrap: nowrap;
-}
-
-.placement-palette-list .title-btn
-{
-	background-color: rgba(0,0,0,0);
-
-	border-width: 0px;
-	flex-grow: 1;
-	margin-left: 6px;
-	margin-right: 12px;
-	font-size: 14px;
-}
-
-.placement-palette-list .title-btn:hover
-{
-	background-color: var(--button-hover-color);
-}
-
-
-.placement-palette-list .title-btn:active
-{
-	background-color: var(--button-press-color);
-}
-
-
-.placement-palette-list .module-type-element .expand-btn
-{
-	width: 20px;
-	height: 20px;
-}
-
-.placement-palette-list .prefabs-tabs
-{
-	overflow: hidden;
-	height: auto;
-}
-
-.placement-palette-list .prefabs-tabs.unexpanded
-{
-	max-height: 0px;
-}
-
 
 .placement-palette-list .prefabs-tabs .prefab-label
 {
@@ -404,6 +365,54 @@ Label
 }
 
 /*END PREFABS TABS*/
+
+
+/*Expandable Element*/
+
+
+.expandable-element .header
+{
+	display: flex;
+	flex-direction: row;
+	justify-content: space-between;
+	flex-wrap: nowrap;
+}
+
+.expandable-element .title-btn
+{
+	background-color: rgba(0,0,0,0);
+
+	border-width: 0px;
+	flex-grow: 1;
+	margin-left: 6px;
+	margin-right: 12px;
+	font-size: 14px;
+}
+
+
+.expandable-element .title-btn:hover
+{
+	background-color: var(--button-hover-color);
+}
+
+
+.expandable-element .title-btn:active
+{
+	background-color: var(--button-press-color);
+}
+
+.expandable-element .expandable-container
+{
+	margin-top: 4px;
+	overflow: hidden;
+	height: auto;
+}
+
+.expandable-element .expandable-container.unexpanded
+{
+	max-height: 0px;
+}
+
 
 
 
@@ -590,6 +599,76 @@ Label
 /*End Module Palette*/
 
 
+/*Materials Editing*/
+
+
+.editing-view .materials-list
+{
+}
+
+.selected-materials-container
+{
+	border-bottom-width: 1px;
+	border-color: var(--border-color);
+	padding-bottom: 12px;
+}
+
+.selected-materials-container .tabs
+{
+}
+
+.selected-materials-container .tab
+{
+	margin-bottom: 6px;
+}
+
+.selected-materials-container .tab.selected
+{
+	background-color: var(--button-press-color);
+	margin-bottom: 1px;
+}
+
+.materials-container
+{
+	display:flex;
+	flex-direction: row;
+	justify-content: center;
+	flex-wrap: wrap;
+	margin-top: 12px;
+}
+
+.material-container
+{
+	width: 150px;
+}
+
+.material-container .material-tab
+{
+	padding: 6px;
+
+	display: flex;
+	align-items: center;
+	width: auto;
+}
+
+.material-container .preview
+{
+	width: 75px;
+}
+
+.material-container .object-field
+{
+	width: 100%;
+}
+
+.material-container .buttons
+{
+	flex-direction: row;
+	justify-content: center;
+	flex-items: stretch;
+}
+
+
 /*Delete Button*/
 
 
@@ -673,4 +752,12 @@ Label
 	padding: 6px;
 	font-size: 20px;
 	white-space: wrap;
+}
+
+.no-selections-label
+{
+	padding: 6px;
+	font-size: 20px;
+	white-space: wrap;
+	-unity-text-align: middle-center;
 }

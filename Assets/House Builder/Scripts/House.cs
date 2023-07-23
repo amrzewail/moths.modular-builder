@@ -9,7 +9,7 @@ namespace HouseBuilder
     {
         private List<GameObject> _queryResult = new List<GameObject>();
         private List<GameObject> _allModules = new List<GameObject>();
-
+        private Dictionary<GameObject, MeshRenderer[]> _moduleMeshRenderers = new Dictionary<GameObject, MeshRenderer[]>();
         public bool hasReference => this;
         public Vector3 origin => transform.position;
 
@@ -24,12 +24,16 @@ namespace HouseBuilder
         private void OnValidate()
         {
             _cellsPerLevel = Mathf.Max(1, _cellsPerLevel);
+
+            CheckUpdateModulesList();
         }
 
         [ContextMenu("Force Update Modules")]
         private void ForceUpdateModulesList()
         {
             _allModules.Clear();
+            _moduleMeshRenderers.Clear();
+
             for (int i = 0; i < transform.childCount; i++)
             {
                 Transform level = transform.GetChild(i);
@@ -38,7 +42,9 @@ namespace HouseBuilder
                     Transform moduleType = level.GetChild(j);
                     for (int k = 0; k < moduleType.childCount; k++)
                     {
-                        _allModules.Add(moduleType.GetChild(k).gameObject);
+                        var g = moduleType.GetChild(k).gameObject;
+                        _allModules.Add(g);
+                        _moduleMeshRenderers[g] = g.GetComponentsInChildren<MeshRenderer>();
                     }
                 }
             }
@@ -49,6 +55,15 @@ namespace HouseBuilder
             if (_allModules.Count == 0)
             {
                 ForceUpdateModulesList();
+            }
+
+            if (_moduleMeshRenderers.Count == 0)
+            {
+                for (int i = 0; i < _allModules.Count; i++)
+                {
+                    var g = _allModules[i];
+                    _moduleMeshRenderers[g] = g.GetComponentsInChildren<MeshRenderer>();
+                }
             }
         }
 
@@ -73,6 +88,7 @@ namespace HouseBuilder
             module.transform.SetParent(child, true);
 
             _allModules.Add(module);
+            _moduleMeshRenderers[module] = module.GetComponentsInChildren<MeshRenderer>();
         }
 
         public void Replace(GameObject oldExistingModule, GameObject newModule)
@@ -196,6 +212,78 @@ namespace HouseBuilder
             var levelIndex = position.y / (gridSize.y * gridsPerLevel);
             if (1f - levelIndex % 1f < 0.01f) return Mathf.CeilToInt(levelIndex);
             else return Mathf.FloorToInt(levelIndex);
+        }
+
+        public MeshRenderer[] GetModuleRenderers(GameObject module)
+        {
+            if (_moduleMeshRenderers.ContainsKey(module)) return _moduleMeshRenderers[module];
+            return new MeshRenderer[0];
+        }
+
+        public List<Material> GetAllModuleMaterials()
+        {
+            return GetModulesMaterials(_allModules);
+        }
+
+        public List<Material> GetModulesMaterials(List<GameObject> modules)
+        {
+            List<Material> materials = new List<Material>();
+            MeshRenderer[] renderers = null;
+            List<Material> rendererMaterials = new List<Material>();
+            for (int i = 0; i < modules.Count; i++)
+            {
+                GameObject g = modules[i];
+
+                if (!g) continue;
+                if (!_moduleMeshRenderers.ContainsKey(g)) continue;
+
+                renderers = _moduleMeshRenderers[g];
+                for (int j = 0; j < renderers.Length; j++)
+                {
+                    renderers[j].GetSharedMaterials(rendererMaterials);
+                    for(int k = 0; k < rendererMaterials.Count; k++)
+                    {
+                        if (materials.Contains(rendererMaterials[k])) continue;
+                        materials.Add(rendererMaterials[k]);
+                    }
+                }
+            }
+            return materials;
+        }
+
+        public List<GameObject> GetAllModulesOfMaterial(Material material)
+        {
+            List<GameObject> modules = new List<GameObject>();
+            MeshRenderer[] renderers = null;
+            List<Material> rendererMaterials = new List<Material>();
+
+            for (int i = 0; i < _allModules.Count; i++)
+            {
+                GameObject g = _allModules[i];
+                if (!g)
+                {
+                    _allModules.RemoveAt(i--);
+                    continue;
+                }
+                if (!_moduleMeshRenderers.ContainsKey(g)) continue;
+                renderers = _moduleMeshRenderers[g];
+                for (int j = 0; j < renderers.Length; j++)
+                {
+                    renderers[j].GetSharedMaterials(rendererMaterials);
+                    for (int k = 0; k < rendererMaterials.Count; k++)
+                    {
+                        if (rendererMaterials[k] == material)
+                        {
+                            modules.Add(g);
+                            goto NEXT_MODULE;
+                        }
+                    }
+
+                }
+            NEXT_MODULE:
+                continue;
+            }
+            return modules;
         }
     }
 }

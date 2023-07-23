@@ -7,7 +7,7 @@ Material:
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  m_Name: Grid Blue
+  m_Name: Grid Purple
   m_Shader: {fileID: -6465566751694194690, guid: 51335133c9d2e4d46867d746bea31d71,
     type: 3}
   m_ValidKeywords: []
@@ -108,7 +108,7 @@ Material:
     - _ZWrite: 1
     m_Colors:
     - _BaseColor: {r: 1, g: 1, b: 1, a: 1}
-    - _Color: {r: 0, g: 0.7718749, b: 1, a: 1}
+    - _Color: {r: 0.48235294, g: 0.09411764, b: 0.36742678, a: 1}
     - _EmissionColor: {r: 0, g: 0, b: 0, a: 1}
     - _SpecColor: {r: 0.19999996, g: 0.19999996, b: 0.19999996, a: 1}
   m_BuildTextureStacks: []

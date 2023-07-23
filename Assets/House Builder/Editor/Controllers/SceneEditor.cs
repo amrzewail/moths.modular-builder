@@ -112,94 +112,6 @@ namespace HouseBuilder.Editor.Controllers
             }
         }
 
-        public void ExtrudeHeight()
-        {
-            List<GameObject> gameObjects = null;
-            if (_editor.Selector.CurrentMultiple.Count > 0)
-            {
-                gameObjects = _editor.Selector.CurrentMultiple.ToList();
-            }
-            else
-            {
-                //gameObjects = _editor.House.GetAllAtHeight(_editor.Palettes.ModuleType, _editor.Grid.CurrentLevelIndex, _editor.Grid.CurrentHeightIndex);
-                //_editor.Grid.totalHeightIndex++;
-            }
-
-            _editor.Selector.Clear();
-            foreach (GameObject g in gameObjects)
-            {
-                GameObject prefab = PrefabUtility.GetCorrespondingObjectFromSource(g);
-                Vector3 position = g.transform.position;
-                position.y += _editor.Grid.gridSize.y;
-
-                int levelIndex = _editor.House.GetModuleLevel(position);
-                string moduleType = _editor.House.GetModuleType(g);
-
-                if (CheckForDuplication(position, g.transform.eulerAngles, moduleType, levelIndex, prefab)) continue;
-
-                prefab = InstantiatePrefab(prefab, moduleType, levelIndex);
-                prefab.transform.position = position;
-                prefab.transform.rotation = g.transform.rotation;
-                prefab.transform.localScale = g.transform.localScale;
-
-                _editor.Selector.Select(prefab);
-
-            }
-
-            _editor.Logger.Log(nameof(SceneEditor), "Attempted extrude height.");
-        }
-
-        public void ReplaceSelectionWith(GameObject prefab)
-        {
-            if (!prefab) return;
-
-            var selections = _editor.Selector.CurrentMultiple;
-            if (selections.Count == 0) return;
-
-            var newModules = new List<GameObject>();
-            foreach (var g in selections)
-            {
-                GameObject module = (GameObject)PrefabUtility.InstantiatePrefab(prefab);
-                module.name = prefab.name;
-                _editor.House.Replace(g, module);
-                Undo.RegisterCreatedObjectUndo(module, "Replaced module object");
-                newModules.Add(module);
-                DestroyGameObject(g);
-            }
-            _editor.Selector.Clear();
-            foreach(var g in newModules)
-            {
-                _editor.Selector.Select(g);
-            }
-            _editor.Logger.Log(nameof(SceneEditor), $"Attempted replace with {prefab.name}");
-        }
-
-        public void AddPrefabToSelection(GameObject prefab)
-        {
-            if (!prefab) return;
-
-            var selections = _editor.Selector.CurrentMultiple;
-            if (selections.Count == 0) return;
-
-            var newModules = new List<GameObject>();
-            foreach (var g in selections)
-            {
-                GameObject module = (GameObject)PrefabUtility.InstantiatePrefab(prefab);
-                module.name = prefab.name;
-                module.transform.position = g.transform.position;
-                module.transform.rotation = g.transform.rotation;
-                module.transform.localScale = g.transform.localScale;
-                _editor.House.Add(_editor.House.GetModuleType(g), _editor.House.GetModuleLevel(g.transform.position), module);
-                Undo.RegisterCreatedObjectUndo(module, "Replaced module object");
-                newModules.Add(module);
-            }
-            _editor.Selector.Clear();
-            foreach (var g in newModules)
-            {
-                _editor.Selector.Select(g);
-            }
-            _editor.Logger.Log(nameof(SceneEditor), $"Attempted add with {prefab.name}");
-        }
 
         public void OnSceneGUI(SceneView view)
         {
@@ -322,5 +234,137 @@ namespace HouseBuilder.Editor.Controllers
 
             Handles.color = handlesColor;
         }
+
+
+
+        public void ExtrudeHeight()
+        {
+            List<GameObject> gameObjects = null;
+            if (_editor.Selector.CurrentMultiple.Count > 0)
+            {
+                gameObjects = _editor.Selector.CurrentMultiple.ToList();
+            }
+
+            _editor.Selector.Clear();
+            foreach (GameObject g in gameObjects)
+            {
+                GameObject prefab = PrefabUtility.GetCorrespondingObjectFromSource(g);
+                Vector3 position = g.transform.position;
+                position.y += _editor.Grid.gridSize.y;
+
+                int levelIndex = _editor.House.GetModuleLevel(position);
+                string moduleType = _editor.House.GetModuleType(g);
+
+                if (CheckForDuplication(position, g.transform.eulerAngles, moduleType, levelIndex, prefab)) continue;
+
+                MeshRenderer[] ogRenderers = g.GetComponentsInChildren<MeshRenderer>();
+
+                prefab = InstantiatePrefab(prefab, moduleType, levelIndex);
+                prefab.transform.position = position;
+                prefab.transform.rotation = g.transform.rotation;
+                prefab.transform.localScale = g.transform.localScale;
+
+                MeshRenderer[] prefabRenderers = prefab.GetComponentsInChildren<MeshRenderer>();
+
+                for(int i = 0; i < ogRenderers.Length; i++)
+                {
+                    if (i >= prefabRenderers.Length) break;
+                    prefabRenderers[i].sharedMaterials = ogRenderers[i].sharedMaterials;
+                }
+
+                _editor.Selector.Select(prefab);
+
+            }
+
+            _editor.Logger.Log(nameof(SceneEditor), "Attempted extrude height.");
+        }
+
+        public void ReplaceSelectionWith(GameObject prefab)
+        {
+            if (!prefab) return;
+
+            var selections = _editor.Selector.CurrentMultiple;
+            if (selections.Count == 0) return;
+
+            var newModules = new List<GameObject>();
+            foreach (var g in selections)
+            {
+                GameObject module = (GameObject)PrefabUtility.InstantiatePrefab(prefab);
+                module.name = prefab.name;
+                _editor.House.Replace(g, module);
+                Undo.RegisterCreatedObjectUndo(module, "Replaced module object");
+                newModules.Add(module);
+                DestroyGameObject(g);
+            }
+            _editor.Selector.Clear();
+            foreach (var g in newModules)
+            {
+                _editor.Selector.Select(g);
+            }
+            _editor.Logger.Log(nameof(SceneEditor), $"Attempted replace with {prefab.name}");
+        }
+
+        public void AddPrefabToSelection(GameObject prefab)
+        {
+            if (!prefab) return;
+
+            var selections = _editor.Selector.CurrentMultiple;
+            if (selections.Count == 0) return;
+
+            var newModules = new List<GameObject>();
+            foreach (var g in selections)
+            {
+                GameObject module = (GameObject)PrefabUtility.InstantiatePrefab(prefab);
+                module.name = prefab.name;
+                module.transform.position = g.transform.position;
+                module.transform.rotation = g.transform.rotation;
+                module.transform.localScale = g.transform.localScale;
+                _editor.House.Add(_editor.House.GetModuleType(g), _editor.House.GetModuleLevel(g.transform.position), module);
+                Undo.RegisterCreatedObjectUndo(module, "Replaced module object");
+                newModules.Add(module);
+            }
+            _editor.Selector.Clear();
+            foreach (var g in newModules)
+            {
+                _editor.Selector.Select(g);
+            }
+            _editor.Logger.Log(nameof(SceneEditor), $"Attempted add with {prefab.name}");
+        }
+
+        public void ReplaceSelectionWithMaterial(Material oldMaterial, Material material)
+        {
+            if (!_editor.IsHouseValid) return;
+            if (_editor.Selector.CurrentMultiple.Count == 0) return;
+            if (!oldMaterial) return;
+
+            List<Material> rendererMaterials = new List<Material>();
+            foreach(var g in _editor.Selector.CurrentMultiple)
+            {
+                MeshRenderer[] renderers = _editor.House.GetModuleRenderers(g);
+                for (int i = 0; i < renderers.Length; i++)
+                {
+                    renderers[i].GetSharedMaterials(rendererMaterials);
+                    for(int k = 0; k < rendererMaterials.Count; k++)
+                    {
+                        if (rendererMaterials[k] != oldMaterial) continue;
+                        rendererMaterials[k] = material;
+
+                    }
+                    Undo.RecordObject(renderers[i], "Material change");
+                    renderers[i].sharedMaterials = rendererMaterials.ToArray();
+                }
+                _editor.Logger.Log(nameof(SceneEditor), $"Changed material for module {g.name}");
+            }
+        }
+
+        public void SelectAllOfMaterial(Material material)
+        {
+            var modules = _editor.House.GetAllModulesOfMaterial(material);
+            foreach(var m in modules)
+            {
+                _editor.Selector.Select(m);
+            }
+        }
+
     }
 }
