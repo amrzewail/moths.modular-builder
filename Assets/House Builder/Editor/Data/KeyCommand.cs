@@ -19,4 +19,26 @@ namespace HouseBuilder.Editor.Data
         Highlight = 100,
         HighlightAll = 110,
     }
+
+    public static class KeyCommandExtensions
+    {
+        public static string CommandString(this KeyCommand command)
+        {
+            switch (command)
+            {
+                case KeyCommand.Place: return "Place";
+                case KeyCommand.Delete: return "Delete";
+                case KeyCommand.Rotate: return "Rotate";
+                case KeyCommand.Flip: return "Flip";
+                case KeyCommand.Extrude: return "Extrude";
+                case KeyCommand.AdjustHeight: return "Adjust height";
+                case KeyCommand.Frame: return "Frame";
+                case KeyCommand.UnselectPrefab: return "Unselect prefab";
+                case KeyCommand.HidePreview: return "Hide preview";
+                case KeyCommand.Highlight: return "Highlight";
+                case KeyCommand.HighlightAll: return "Highlight all";
+            }
+            return "";
+        }
+    }
 }

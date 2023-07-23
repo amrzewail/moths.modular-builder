@@ -20,6 +20,10 @@ namespace HouseBuilder.Editor.Controllers
         void Update();
 
         void Clear();
+
+        void LoadKeymaps();
+
+        Keymap GetKeymap(InputContext context);
     }
 
 }

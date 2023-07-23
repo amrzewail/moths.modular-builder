@@ -14,6 +14,7 @@ namespace HouseBuilder.Editor.Data
         [SerializeField] bool alt;
         [SerializeField] bool ctrl;
         [SerializeField] bool shift;
+        [SerializeField] bool consumeEvent;
 
         public KeyCommand Command => command;
         public KeyBehaviour Behaviour => behaviour;
@@ -22,5 +23,20 @@ namespace HouseBuilder.Editor.Data
         public bool Alt => alt;
         public bool Shift => shift;
         public bool Ctrl => ctrl;
+
+        public bool Consume => consumeEvent;
+
+        public override string ToString()
+        {
+            string txt = "";
+            txt += shift ? "Shift " : "";
+            txt += ctrl ? "Ctrl " : "";
+            txt += alt ? "Alt " : "";
+            txt += Key != KeyCode.None ? $"{Key} " : "";
+            txt += Mouse != MouseButton.None ? $"{Mouse.MouseButtonString()} " : "";
+            txt += Behaviour == KeyBehaviour.ScrollWheel ? "Scroll Wheel " : "";
+            txt += $": {Command.CommandString()}";
+            return txt;
+        }
     }
 }

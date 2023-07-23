@@ -1,4 +1,7 @@
 using HouseBuilder.Editor.Data;
+using System;
+using System.Collections.Generic;
+using System.Linq;
 using UnityEditor;
 using UnityEngine;
 
@@ -8,31 +11,33 @@ namespace HouseBuilder.Editor.Controllers
     {
         private class MouseClick
         {
+            private ILogger _logger;
             private int _button = 0;
+
+            private long _pressTimestampTicks;
+            private long _lastClickTimestampTicks;
+
             private bool _isClickDown = false;
             private bool _isDraggable = false;
+            private bool _isDoubleClick = false;
 
-            public MouseClick(int button)
+            private const long CLICK_TIME_TICKS = 200 * TimeSpan.TicksPerMillisecond;
+            private const long DOUBLE_CLICK_TIME_TICKS = 400 * TimeSpan.TicksPerMillisecond;
+
+            public MouseClick(int button, ILogger logger)
             {
                 _button = button;
+                _logger = logger;
             }
 
-            public bool IsClick(Event ev)
+            public void Update(Event ev)
             {
-                if (ev.button == _button && ev.type == EventType.MouseUp)
-                {
-                    _isDraggable = false;
-                    if (_isClickDown)
-                    {
-                        _isClickDown = false;
-                        return true;
-                    }
-                }
-
                 if (ev.button == _button && ev.type == EventType.MouseDown)
                 {
                     _isClickDown = true;
                     _isDraggable = true;
+                    _pressTimestampTicks = DateTime.UtcNow.Ticks;
+                    _logger.Log(nameof(MouseClick), $"Mouse: {_button} is down.");
                 }
 
                 if (_isClickDown)
@@ -40,8 +45,51 @@ namespace HouseBuilder.Editor.Controllers
                     if (ev.type == EventType.MouseDrag)
                     {
                         _isClickDown = false;
+                        _logger.Log(nameof(MouseClick), $"Mouse: {_button} click cancelled for drag.");
+                    }
+                    if (DateTime.UtcNow.Ticks - _pressTimestampTicks > CLICK_TIME_TICKS)
+                    {
+                        _isClickDown = false;
+                        _logger.Log(nameof(MouseClick), $"Mouse: {_button} click cancelled exceeded time.");
                     }
                 }
+            }
+
+            public bool IsClick(Event ev)
+            {
+                long ticks = DateTime.UtcNow.Ticks;
+                _isDoubleClick = false;
+
+                if (_isClickDown && ticks - _pressTimestampTicks > CLICK_TIME_TICKS)
+                {
+                    _isClickDown = false;
+                    _logger.Log(nameof(MouseClick), $"Mouse: {_button} click cancelled exceeded time.");
+                }
+                if (ev.button == _button && ev.type == EventType.MouseUp)
+                {
+                    _isDraggable = false;
+                    if (_isClickDown)
+                    {
+                        _logger.Log(nameof(MouseClick), $"Mouse: {_button} is clicked, isClickActive:{_isClickDown} holdTime:{(ticks - _pressTimestampTicks) / TimeSpan.TicksPerMillisecond}");
+
+                        _isClickDown = false;
+
+                        if (ticks - _lastClickTimestampTicks < DOUBLE_CLICK_TIME_TICKS)
+                        {
+                            _logger.Log(nameof(MouseClick), $"Mouse: {_button} is double clicking, lastClickTime:{(ticks - _lastClickTimestampTicks) / TimeSpan.TicksPerMillisecond}");
+                            _isDoubleClick = true;
+                        }
+                        else
+                        {
+                            _logger.Log(nameof(MouseClick), $"Mouse: {_button} not double clicking, lastClickTime:{(ticks - _lastClickTimestampTicks) / TimeSpan.TicksPerMillisecond}");
+                        }
+
+                        _lastClickTimestampTicks = ticks;
+
+                        return true;
+                    }
+                }
+
                 return false;
             }
 
@@ -55,6 +103,11 @@ namespace HouseBuilder.Editor.Controllers
                 return false;
             }
 
+            public bool IsDoubleClick()
+            {
+                return _isDoubleClick;
+            }
+
             public void Cancel()
             {
                 _isClickDown = false;
@@ -62,12 +115,105 @@ namespace HouseBuilder.Editor.Controllers
             }
         }
 
+        private class KeyClick
+        {
+            private ILogger _logger;
+            private KeyCode _downKey;
+            private KeyCode _lastClickedKey;
+
+            private long _pressTimestampTicks;
+            private bool _isClickDown = false;
+            private bool _isDoubleClick = false;
+
+            private long _lastClickTimestampTicks;
+
+            private const long CLICK_TIME_TICKS = 200 * TimeSpan.TicksPerMillisecond;
+            private const long DOUBLE_CLICK_TIME_TICKS = 400 * TimeSpan.TicksPerMillisecond;
+
+            public KeyClick(ILogger logger)
+            {
+                _logger = logger;
+            }
+
+            public void Update(Event ev)
+            {
+
+                if (ev.type == EventType.KeyDown && _downKey != ev.keyCode)
+                {
+                    _downKey = ev.keyCode;
+                    _isClickDown = true;
+                    _pressTimestampTicks = DateTime.UtcNow.Ticks;
+                    _logger.Log(nameof(KeyClick), $"{ev.keyCode} is down.");
+                    
+                }
+                if (_isClickDown)
+                {
+                    if (DateTime.UtcNow.Ticks - _pressTimestampTicks > CLICK_TIME_TICKS)
+                    {
+                        _isClickDown = false;
+                        _logger.Log(nameof(KeyClick), $"{_downKey} click cancelled.");
+                    }
+                }
+            }
+
+            public bool IsClick(Event ev, KeyCode key)
+            {
+                long ticks = DateTime.UtcNow.Ticks;
+                _isDoubleClick = false;
+
+                if (_isClickDown)
+                {
+                    if (ticks - _pressTimestampTicks > CLICK_TIME_TICKS)
+                    {
+                        _isClickDown = false;
+                        _logger.Log(nameof(KeyClick), $"{_downKey} click cancelled.");
+                        _downKey = KeyCode.None;
+                    }
+                }
+                if (ev.keyCode == _downKey && ev.type == EventType.KeyUp)
+                {
+                    bool istrue = false;
+                    _logger.Log(nameof(KeyClick), $"{ev.keyCode} is up, isClickActive:{_isClickDown} holdTime:{(ticks - _pressTimestampTicks) / TimeSpan.TicksPerMillisecond}");
+                    if (_downKey == key && _isClickDown)
+                    {
+                        istrue = true;
+
+                        if (ticks - _lastClickTimestampTicks < DOUBLE_CLICK_TIME_TICKS && _lastClickedKey == _downKey)
+                        {
+                            _logger.Log(nameof(MouseClick), $"{ev.keyCode} is double clicking, lastClickTime:{(ticks - _lastClickTimestampTicks) / TimeSpan.TicksPerMillisecond}");
+                            _isDoubleClick = true;
+                        }
+                        else
+                        {
+                            _logger.Log(nameof(MouseClick), $"{ev.keyCode} not double clicking, lastClickedKey:{_lastClickedKey} lastClickTime:{(ticks - _lastClickTimestampTicks) / TimeSpan.TicksPerMillisecond}");
+                        }
+
+                        _lastClickedKey = _downKey;
+                        _lastClickTimestampTicks = ticks;
+                    }
+
+                    _isClickDown = false;
+                    _downKey = KeyCode.None;
+
+                    return istrue;
+                }
+                return false;
+            }
+
+            public bool IsDoubleClick()
+            {
+                return _isDoubleClick;
+            }
+        }
+
 
         private readonly ILogger _logger;
 
-        private MouseClick _leftClickPlacement = new MouseClick(0);
-        private MouseClick _leftClickHighlight = new MouseClick(0);
-        private Keymap _keymap;
+        private KeyClick _keyClick;
+        private MouseClick _leftClick;
+        private MouseClick _rightClick;
+        private Dictionary<InputContext, Keymap> _keymaps;
+        private KeyCommand _lastCommand;
 
         private InputContext _context;
 
@@ -81,7 +227,30 @@ namespace HouseBuilder.Editor.Controllers
         public InputController(ILogger logger)
         {
             _logger = logger;
-            _keymap = Resources.LoadAll<Keymap>("HouseBuilder/")[0];
+            _keyClick = new KeyClick(_logger);
+            _leftClick = new MouseClick(0, logger);
+            _rightClick = new MouseClick(1, logger);
+
+            LoadKeymaps();
+        }
+
+        public void LoadKeymaps()
+        {
+            var maps = Resources.LoadAll<Keymap>("HouseBuilder/");
+
+            _keymaps = new Dictionary<InputContext, Keymap>();
+            Dictionary<InputContext, int> currentPriorities = new Dictionary<InputContext, int>();
+            for (int i = 0; i < maps.Length; i++)
+            {
+                if (!currentPriorities.ContainsKey(maps[i].context)) currentPriorities[maps[i].context] = -1;
+                if (maps[i].priority > currentPriorities[maps[i].context])
+                {
+                    _keymaps[maps[i].context] = maps[i];
+                    currentPriorities[maps[i].context] = maps[i].priority;
+                }
+            }
+
+            _logger.Log(nameof(InputController), "Loaded keymaps.");
         }
 
         public void SetContext(InputContext context)
@@ -89,109 +258,220 @@ namespace HouseBuilder.Editor.Controllers
             _context = context;
         }
 
-        public void Update()
+        public Keymap GetKeymap(InputContext context)
         {
-
+            if (_keymaps.ContainsKey(context))
+            {
+                return _keymaps[context];
+            }
+            return null;
         }
 
-
-        public void UpdateFF()
+        public void Update()
         {
             Clear();
 
-            //if (Event.current.alt) _leftClickHighlight.Cancel();
-            //if (Event.current.alt || Event.current.control) _leftClickPlacement.Cancel();
+            MousePosition = Event.current.mousePosition;
 
-            //MousePosition = Event.current.mousePosition;
+            _keyClick.Update(Event.current);
+            _leftClick.Update(Event.current);
+            _rightClick.Update(Event.current);
+            
+            if (!_keymaps.ContainsKey(_context)) return;
 
-            //if (Event.current.type == EventType.KeyDown && Event.current.keyCode == KeyCode.E && Event.current.control && !Event.current.alt)
-            //{
-            //    Command = KeyCommand.Extrude;
-            //    return;
-            //}
+            var keymap = _keymaps[_context];
+            foreach (var binding in keymap.bindings)
+            {
+                if (ProcessBinding(binding))
+                {
+                    Command = binding.Command;
+                    if (_lastCommand != Command)
+                    {
+                        _logger.Log(nameof(InputController), $"Run command {Command}");
+                        _lastCommand = Command;
+                    }
+                    break;
+                }
+            }
+        }
 
-            //if (Event.current.keyCode == KeyCode.Escape && Event.current.type == EventType.KeyDown)
-            //{
-            //    Command = KeyCommand.UnselectPrefab;
-            //    return;
-            //}
+        private bool ProcessBinding(KeyBinding binding)
+        {
+            if (binding.Behaviour == KeyBehaviour.Nothing) return false;
 
-            //if (Event.current.keyCode == KeyCode.F && Event.current.type == EventType.KeyDown)
-            //{
-            //    Command = KeyCommand.Frame;
-            //    Event.current.Use();
-            //    return;
-            //}
+            bool isAlt = Event.current.alt == binding.Alt;
+            bool isShift = Event.current.shift == binding.Shift;
+            bool isCtrl = Event.current.control == binding.Ctrl;
 
-            //if (Event.current.type == EventType.MouseUp && Event.current.button == 0 && Event.current.control && Event.current.shift && !Event.current.alt)
-            //{
-            //    Command = KeyCommand.HighlightAll;
-            //    return;
-            //}
+            if (!isAlt || !isShift || !isCtrl) return false;
 
+            bool isKey = true;
 
-            //if (Event.current.alt && Event.current.type == EventType.ScrollWheel)
-            //{
-            //    Vector2 delta = Event.current.delta;
-            //    ScrollWheel = Mathf.RoundToInt(Mathf.Sign(delta.y));
-            //    Command = KeyCommand.Rotate;
-            //    Event.current.Use();
-            //    return;
-            //}
+            if (binding.Key != KeyCode.None)
+            {
+                isKey = binding.Key == Event.current.keyCode;
+            }
 
-            //if (Event.current.alt && Event.current.type == EventType.MouseDown && Event.current.button == 1)
-            //{
-            //    Command = KeyCommand.Flip;
-            //    return;
-            //}
+            if (!isKey) return false;
 
-            //if (Event.current.control && Event.current.type == EventType.ScrollWheel)
-            //{
-            //    Vector2 delta = Event.current.delta;
-            //    ScrollWheel = -Mathf.RoundToInt(Mathf.Sign(delta.y));
-            //    Command = KeyCommand.AdjustHeight;
-            //    Event.current.Use();
-            //    return;
-            //}
+            bool isMouseBtn = true;
 
+            if (binding.Mouse != MouseButton.None)
+            {
+                isMouseBtn = (binding.Mouse == MouseButton.Left && Event.current.button == 0) || (binding.Mouse == MouseButton.Right && Event.current.button == 1);
+            }
 
-            //if (Event.current.type == EventType.KeyUp && Event.current.keyCode == KeyCode.Backspace)
-            //{
-            //    Command = KeyCommand.Delete;
-            //    return;
-            //}
+            if (!isMouseBtn) return false;
 
+            bool isMouseDrag = false;
+            bool isMouseClick = false;
+            bool isMouseDoubleClick = false;
 
-            //if (Event.current.control && !Event.current.alt)
-            //{
-            //    if (_leftClickHighlight.IsClick(Event.current))
-            //    {
-            //        Command = KeyCommand.HighlightClick;
-            //    }
-            //    else if (_leftClickHighlight.IsDrag(Event.current))
-            //    {
-            //        Command = KeyCommand.HighlightDrag;
-            //    }
-            //    else
-            //    {
-            //        Command = KeyCommand.HidePreview;
-            //    }
-            //    return;
-            //}
+            if (binding.Mouse != MouseButton.None)
+            {
+                switch (Event.current.button)
+                {
+                    case 0: isMouseDrag = _leftClick.IsDrag(Event.current); break;
+                    case 1: isMouseDrag = _rightClick.IsDrag(Event.current); break;
+                }
 
-            //if (Event.current.alt == false && Event.current.control == false)
-            //{
-            //    if (_leftClickPlacement.IsClick(Event.current))
-            //    {
-            //        Command = KeyCommand.LeftMouseButtonUp;
-            //    }
-            //    else if (_leftClickPlacement.IsDrag(Event.current))
-            //    {
-            //        Command = KeyCommand.LeftMouseButtonUp;
-            //    }
-            //}
+                switch (Event.current.button)
+                {
+                    case 0: isMouseClick = _leftClick.IsClick(Event.current); break;
+                    case 1: isMouseClick = _rightClick.IsClick(Event.current); break;
+                }
+
+                switch (Event.current.button)
+                {
+                    case 0: isMouseDoubleClick = _leftClick.IsDoubleClick(); break;
+                    case 1: isMouseDoubleClick = _rightClick.IsDoubleClick(); break;
+                }
+            }
+
+            bool isKeyClick = false;
+            bool isKeyDoubleClick = false;
+
+            if (binding.Key != KeyCode.None)
+            {
+                isKeyClick = _keyClick.IsClick(Event.current, binding.Key);
+                isKeyDoubleClick = _keyClick.IsDoubleClick();
+            }
+
+            bool isBindingTrue = true;
+
+            switch (binding.Behaviour)
+            {
+                case KeyBehaviour.Press:
+                    if (binding.Key != KeyCode.None && binding.Mouse == MouseButton.None)
+                    {
+                        isBindingTrue = Event.current.type == EventType.KeyDown;
+                    }else if (binding.Key == KeyCode.None && binding.Mouse != MouseButton.None)
+                    {
+                        isBindingTrue = Event.current.type == EventType.MouseDown;
+                    }else if (binding.Key != KeyCode.None && binding.Mouse != MouseButton.None)
+                    {
+                        isBindingTrue = (Event.current.type == EventType.KeyDown) && (Event.current.type == EventType.MouseDown);
+                    }
+                    break;
+
+                case KeyBehaviour.Release:
+
+                    if (binding.Key != KeyCode.None && binding.Mouse == MouseButton.None)
+                    {
+                        isBindingTrue = Event.current.type == EventType.KeyUp;
+                    }
+                    else if (binding.Key == KeyCode.None && binding.Mouse != MouseButton.None)
+                    {
+                        isBindingTrue = Event.current.type == EventType.MouseUp;
+                    }
+                    else if (binding.Key != KeyCode.None && binding.Mouse != MouseButton.None)
+                    {
+                        isBindingTrue = (Event.current.type == EventType.KeyUp) && (Event.current.type == EventType.MouseUp);
+                    }
+                    break;
+
+                case KeyBehaviour.Click:
+
+                    //keyboard key only
+                    if (binding.Key != KeyCode.None && binding.Mouse == MouseButton.None)
+                    {
+                        isBindingTrue = isKeyClick;
+                    }
+                    //mouse button only
+                    else if (binding.Key == KeyCode.None && binding.Mouse != MouseButton.None)
+                    {
+                        isBindingTrue = isMouseClick;
+                    }
+                    //keyboard and mouse
+                    else if (binding.Key != KeyCode.None && binding.Mouse != MouseButton.None)
+                    {
+                        isBindingTrue = isKeyClick && isMouseClick;
+                    }
+                    break;
+
+                case KeyBehaviour.DoubleClick:
+
+                    //keyboard key only
+                    if (binding.Key != KeyCode.None && binding.Mouse == MouseButton.None)
+                    {
+                        isBindingTrue = isKeyDoubleClick;
+                    }
+                    //mouse button only
+                    else if (binding.Key == KeyCode.None && binding.Mouse != MouseButton.None)
+                    {
+                        isBindingTrue = isMouseDoubleClick;
+                    }
+                    //keyboard and mouse
+                    else if (binding.Key != KeyCode.None && binding.Mouse != MouseButton.None)
+                    {
+                        isBindingTrue = isKeyDoubleClick && isMouseDoubleClick;
+                    }
+
+                    break;
+
+                case KeyBehaviour.ClickOrDrag:
+
+                    //keyboard key only
+                    if (binding.Key != KeyCode.None && binding.Mouse == MouseButton.None)
+                    {
+                        isBindingTrue = isKeyClick;
+                    }
+                    //mouse button only
+                    else if (binding.Key == KeyCode.None && binding.Mouse != MouseButton.None)
+                    {
+                        isBindingTrue = isMouseClick || isMouseDrag;
+                    }
+                    //keyboard and mouse
+                    else if (binding.Key != KeyCode.None && binding.Mouse != MouseButton.None)
+                    {
+                        isBindingTrue = isKeyClick && (isMouseClick || isMouseDrag);
+                    }
+
+                    break;
+
+                case KeyBehaviour.ScrollWheel:
+                    if (Event.current.isScrollWheel)
+                    {
+                        Vector2 delta = Event.current.delta;
+                        ScrollWheel = -Mathf.RoundToInt(Mathf.Sign(delta.y));
+                    }
+                    else
+                    {
+                        isBindingTrue = false;
+                    }
+                    break;
+
+            }
+
+            if (isBindingTrue && binding.Consume)
+            {
+                Event.current.Use();
+            }
+
+            return isBindingTrue;
 
         }
+
 
         public void Clear()
         {

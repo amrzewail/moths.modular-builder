@@ -2,10 +2,25 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-public enum MouseButton
+namespace HouseBuilder.Editor.Data
 {
-    None = 0,
-    Left = 10,
-    Right = 20,
-    ScrollWheel = 100,
+    public enum MouseButton
+    {
+        None = 0,
+        Left = 10,
+        Right = 20,
+    }
+
+    public static class MouseButtonExtensions
+    {
+        public static string MouseButtonString(this MouseButton button)
+        {
+            switch (button)
+            {
+                case MouseButton.Left: return "LMB";
+                case MouseButton.Right: return "RMB";
+            }
+            return "";
+        }
+    }
 }

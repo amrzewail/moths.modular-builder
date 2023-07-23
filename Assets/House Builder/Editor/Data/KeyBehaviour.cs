@@ -12,5 +12,6 @@ namespace HouseBuilder.Editor.Data
         Click = 30,
         DoubleClick = 40,
         ClickOrDrag = 50,
+        ScrollWheel = 60,
     }
 }

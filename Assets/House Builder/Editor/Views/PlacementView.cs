@@ -38,17 +38,24 @@ namespace HouseBuilder.Editor.Views
         {
             this.AddToClassList("placement-view");
 
+            var keymap = _editor.Input.GetKeymap(InputContext.Placement);
+
             Label shortcuts = new Label();
-            shortcuts.text = 
-                "LMB: Place modules\n" +
-                "Alt + Scroll wheel: Rotate module\n" +
-                "Alt + RMB: Flip module x-axis\n" +
-                "Ctrl + LMB: Select modules\n" +
-                "Ctrl + Shift + LMB: Select all of prefab type\n" +
-                "Backspace: Delete selected\n" +
-                "Ctrl + E: Extrude selected up\n" +
-                "Esc: Clear selections\n" +
-                "";
+            shortcuts.text = "";
+            foreach(var binding in keymap.bindings)
+            {
+                shortcuts.text += binding.ToString();
+                shortcuts.text += "\n";
+            }
+                //"LMB: Place modules\n" +
+                //"Alt + Scroll wheel: Rotate module\n" +
+                //"Alt + RMB: Flip module x-axis\n" +
+                //"Ctrl + LMB: Select modules\n" +
+                //"Ctrl + Shift + LMB: Select all of prefab type\n" +
+                //"Backspace: Delete selected\n" +
+                //"Ctrl + E: Extrude selected up\n" +
+                //"Esc: Clear selections\n" +
+                //"";
             shortcuts.AddToClassList("shortcuts-label");
             this.Add(shortcuts);
 
