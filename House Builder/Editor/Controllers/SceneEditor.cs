@@ -61,20 +61,22 @@ namespace HouseBuilder.Editor.Controllers
         {
             if (_editor.Previewer.Prefab == null) return null;
             GameObject module = InstantiatePrefab(_editor.Previewer.Prefab, _editor.Palettes.CurrentModuleType, _editor.Grid.CurrentLevelIndex);
+            Undo.RegisterFullObjectHierarchyUndo(module, "New module object values");
             module.name = _editor.Previewer.Prefab.name;
             module.transform.position = _editor.Previewer.position;
             module.transform.eulerAngles = _editor.Previewer.eulerAngles;
             module.transform.localScale = _editor.Previewer.localScale;
             _editor.House.Add(_editor.Palettes.CurrentModuleType, _editor.Grid.CurrentLevelIndex, module);
             _editor.Logger.Log(nameof(SceneEditor), "Instantiated preview GameObject.");
+            Undo.SetCurrentGroupName("Create new module");
             return module;
         }
 
         private GameObject InstantiatePrefab(GameObject prefab, string moduleType, int levelIndex)
         {
             GameObject module = (GameObject)PrefabUtility.InstantiatePrefab(prefab);
-            module.name = prefab.name;
             Undo.RegisterCreatedObjectUndo(module, "Created module object");
+            module.name = prefab.name;
             return module;
         }
 
@@ -261,6 +263,8 @@ namespace HouseBuilder.Editor.Controllers
                 MeshRenderer[] ogRenderers = g.GetComponentsInChildren<MeshRenderer>();
 
                 prefab = InstantiatePrefab(prefab, moduleType, levelIndex);
+                Undo.RegisterFullObjectHierarchyUndo(prefab, "New extruded module object values");
+
                 prefab.transform.position = position;
                 prefab.transform.rotation = g.transform.rotation;
                 prefab.transform.localScale = g.transform.localScale;
@@ -277,6 +281,8 @@ namespace HouseBuilder.Editor.Controllers
                 _editor.Selector.Select(prefab);
 
             }
+
+            Undo.SetCurrentGroupName("Extrude prefabs");
 
             _editor.Logger.Log(nameof(SceneEditor), "Attempted extrude height.");
         }

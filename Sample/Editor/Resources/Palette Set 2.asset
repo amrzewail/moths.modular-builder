@@ -10,7 +10,7 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: e00e1e07e2a5ff34084d824621b3373e, type: 3}
-  m_Name: Hidden Shore
+  m_Name: Palette Set 2
   m_EditorClassIdentifier: 
   <Palettes>k__BackingField:
   - {fileID: 11400000, guid: 1169e42b3062669449e2625979b82dd3, type: 2}

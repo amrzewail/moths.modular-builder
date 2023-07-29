@@ -138,8 +138,9 @@ namespace HouseBuilder
                 child.SetParent(levelChild);
                 child.localPosition = Vector3.zero;
             }
-            module.transform.SetParent(child, true);
-
+#if UNITY_EDITOR
+            UnityEditor.Undo.SetTransformParent(module.transform, child, "Module set house level parent");
+#endif
             if (module.TryGetComponent(out HouseModule houseModule))
             {
                 houseModule.Refresh(this, true);
@@ -154,7 +155,9 @@ namespace HouseBuilder
         {
             var parent = oldExistingModule.GetComponentInParent<IHouse>();
             if (parent != (IHouse)this) return;
-            newModule.transform.SetParent(oldExistingModule.transform.parent);
+#if UNITY_EDITOR
+            UnityEditor.Undo.SetTransformParent(newModule.transform, oldExistingModule.transform.parent, "Module set house level parent");
+#endif
             newModule.transform.position = oldExistingModule.transform.position;
             newModule.transform.rotation = oldExistingModule.transform.rotation;
             newModule.transform.localScale = oldExistingModule.transform.localScale;
@@ -180,7 +183,7 @@ namespace HouseBuilder
 
             for (int i = 0; i < searchingList.Count; i++)
             {
-                if (!_allModules[i])
+                if (!searchingList[i])
                 {
                     searchingList.RemoveAt(i);
                     i--;
