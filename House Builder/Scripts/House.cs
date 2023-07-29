@@ -308,7 +308,7 @@ namespace HouseBuilder
 
         public int GetModuleLevel(Vector3 position)
         {
-            var levelIndex = position.y / (gridSize.y * gridsPerLevel);
+            var levelIndex = (position.y - transform.position.y) / (gridSize.y * gridsPerLevel);
             if (1f - levelIndex % 1f < 0.01f) return Mathf.CeilToInt(levelIndex);
             else return Mathf.FloorToInt(levelIndex);
         }
