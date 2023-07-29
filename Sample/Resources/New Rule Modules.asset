@@ -1,0 +1,179 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 28918056ec37465458db7f9aa476e504, type: 3}
+  m_Name: New Rule Modules
+  m_EditorClassIdentifier: 
+  modulingRules:
+  - ruleId: 5e476a0e-f473-47f3-a671-eee81629e297
+    rules:
+    - direction: 2
+      condition: 0
+      moduleType: Wall
+      unitDistance: 1
+    - direction: 1
+      condition: 0
+      moduleType: Wall
+      unitDistance: 2
+    prefab: {fileID: 8987289158191943656, guid: d69a2d38d7c92c846a6ee4f350df7a20,
+      type: 3}
+    rotation: {x: 0.5, y: -0.5, z: -0.5, w: -0.5}
+    scale: {x: 1, y: 1, z: 1}
+  - ruleId: c2d3b655-2fc3-4f28-8bca-2415fef327e5
+    rules:
+    - direction: 2
+      condition: 0
+      moduleType: Wall
+      unitDistance: 2
+    - direction: 3
+      condition: 0
+      moduleType: Wall
+      unitDistance: 1
+    prefab: {fileID: 8447733178662158982, guid: aba38c8a70e5d8e4fbeea085112c9ee7,
+      type: 3}
+    rotation: {x: 0.7071068, y: -0.000000061817246, z: -0.000000061817246, w: -0.7071068}
+    scale: {x: 1, y: 1, z: 1}
+  - ruleId: e054b0fa-5ec1-459f-8f80-2bd25968b672
+    rules:
+    - direction: 3
+      condition: 0
+      moduleType: Wall
+      unitDistance: 2
+    - direction: 1
+      condition: 0
+      moduleType: Wall
+      unitDistance: 1
+    prefab: {fileID: 8987289158191943656, guid: d69a2d38d7c92c846a6ee4f350df7a20,
+      type: 3}
+    rotation: {x: -0.000000030908623, y: -0.7071068, z: -0.7071068, w: 0.000000030908623}
+    scale: {x: 1, y: 1, z: 1}
+  - ruleId: f2ae058d-2851-4700-85a9-c1bc879b05fd
+    rules:
+    - direction: 2
+      condition: 0
+      moduleType: Wall
+      unitDistance: 2
+    - direction: 0
+      condition: 0
+      moduleType: Wall
+      unitDistance: 1
+    prefab: {fileID: 8987289158191943656, guid: d69a2d38d7c92c846a6ee4f350df7a20,
+      type: 3}
+    rotation: {x: 0.7071068, y: -0, z: -0, w: -0.7071068}
+    scale: {x: 1, y: 1, z: 1}
+  - ruleId: fc7f6917-48c7-4a2d-b5bb-5170ad978cb5
+    rules:
+    - direction: 2
+      condition: 0
+      moduleType: Wall
+      unitDistance: 1
+    - direction: 3
+      condition: 0
+      moduleType: Wall
+      unitDistance: 2
+    prefab: {fileID: 8447733178662158982, guid: aba38c8a70e5d8e4fbeea085112c9ee7,
+      type: 3}
+    rotation: {x: -0.000000030908623, y: -0.7071068, z: -0.7071068, w: 0.000000030908623}
+    scale: {x: 1, y: 1, z: 1}
+  - ruleId: f5aa3574-8229-4fc2-90b7-b447cf5ec87b
+    rules:
+    - direction: 3
+      condition: 0
+      moduleType: Wall
+      unitDistance: 1
+    - direction: 0
+      condition: 0
+      moduleType: Wall
+      unitDistance: 2
+    prefab: {fileID: 8987289158191943656, guid: d69a2d38d7c92c846a6ee4f350df7a20,
+      type: 3}
+    rotation: {x: -0.5, y: -0.5, z: -0.5, w: 0.5}
+    scale: {x: 1, y: 1, z: 1}
+  - ruleId: 20fca894-9925-44cf-b47a-8f98ba3f18e1
+    rules:
+    - direction: 1
+      condition: 0
+      moduleType: Wall
+      unitDistance: 1
+    prefab: {fileID: 8447733178662158982, guid: aba38c8a70e5d8e4fbeea085112c9ee7,
+      type: 3}
+    rotation: {x: -0.4999999, y: -0.5000001, z: -0.5000001, w: 0.4999999}
+    scale: {x: 1, y: 1.0000001, z: 1.0000001}
+  - ruleId: 62a1d58c-17ca-4ce8-8ffb-9a33ba4ab177
+    rules:
+    - direction: 0
+      condition: 0
+      moduleType: Wall
+      unitDistance: 1
+    prefab: {fileID: 8447733178662158982, guid: aba38c8a70e5d8e4fbeea085112c9ee7,
+      type: 3}
+    rotation: {x: -0.4999999, y: -0.5000001, z: -0.5000001, w: 0.4999999}
+    scale: {x: 1, y: 1.0000001, z: 1.0000001}
+  - ruleId: 14eacb5a-4984-43e8-949f-8672db44b51c
+    rules:
+    - direction: 2
+      condition: 0
+      moduleType: Wall
+      unitDistance: 1
+    prefab: {fileID: 8447733178662158982, guid: aba38c8a70e5d8e4fbeea085112c9ee7,
+      type: 3}
+    rotation: {x: 0.00000013411046, y: -0.7071068, z: -0.7071068, w: -0.00000013411046}
+    scale: {x: 0.99999976, y: 0.9999999, z: 0.9999999}
+  - ruleId: 2c4d419c-dd9d-470f-bfbf-209d76e34839
+    rules:
+    - direction: 3
+      condition: 0
+      moduleType: Wall
+      unitDistance: 1
+    prefab: {fileID: 8447733178662158982, guid: aba38c8a70e5d8e4fbeea085112c9ee7,
+      type: 3}
+    rotation: {x: 0.00000013411046, y: -0.7071068, z: -0.7071068, w: -0.00000013411046}
+    scale: {x: 0.99999976, y: 0.9999999, z: 0.9999999}
+  - ruleId: 2db39e76-f559-42ad-b55d-3418712cf4a9
+    rules:
+    - direction: 0
+      condition: 0
+      moduleType: Wall
+      unitDistance: 2
+    prefab: {fileID: 8447733178662158982, guid: aba38c8a70e5d8e4fbeea085112c9ee7,
+      type: 3}
+    rotation: {x: -0.5, y: -0.5, z: -0.5, w: 0.5}
+    scale: {x: 1, y: 1, z: 1}
+  - ruleId: 2d4e72a8-67d2-40a2-b290-8eeca3880d22
+    rules:
+    - direction: 0
+      condition: 0
+      moduleType: Wall
+      unitDistance: 1
+    prefab: {fileID: 8447733178662158982, guid: aba38c8a70e5d8e4fbeea085112c9ee7,
+      type: 3}
+    rotation: {x: 0.50000006, y: -0.49999997, z: -0.49999997, w: -0.50000006}
+    scale: {x: 1, y: 1, z: 1}
+  - ruleId: ceb3a4d0-5272-4ac7-bdbd-8de2b2af40f0
+    rules:
+    - direction: 1
+      condition: 0
+      moduleType: Wall
+      unitDistance: 1
+    prefab: {fileID: 8447733178662158982, guid: aba38c8a70e5d8e4fbeea085112c9ee7,
+      type: 3}
+    rotation: {x: -0.5, y: -0.5, z: -0.5, w: 0.5}
+    scale: {x: 1, y: 1, z: 1}
+  - ruleId: b719f533-f43e-459d-b374-927a266af566
+    rules:
+    - direction: 1
+      condition: 0
+      moduleType: Wall
+      unitDistance: 2
+    prefab: {fileID: 8447733178662158982, guid: aba38c8a70e5d8e4fbeea085112c9ee7,
+      type: 3}
+    rotation: {x: 0.50000006, y: -0.49999997, z: -0.49999997, w: -0.50000006}
+    scale: {x: 1, y: 1, z: 1}
