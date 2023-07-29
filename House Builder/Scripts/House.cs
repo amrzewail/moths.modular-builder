@@ -257,7 +257,13 @@ namespace HouseBuilder
             for (int i = 0; i < childCount; i++)
             {
                 Transform child = transform.GetChild(i);
-                int childLevel = int.Parse(child.name.Substring(levelTxtLength, child.name.Length - levelTxtLength));
+                var childName = child.name.Substring(levelTxtLength, child.name.Length - levelTxtLength);
+                int childLevel = 0;
+                if (!int.TryParse(childName, out childLevel))
+                {
+                    Debug.LogError($"House:: Selected house has invalid Level child objects");
+                    continue;
+                }
                 child.gameObject.SetActive(childLevel < minInclusive || childLevel >= maxExlusive);
             }
         }
