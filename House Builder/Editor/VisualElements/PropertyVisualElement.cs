@@ -9,6 +9,8 @@ using UnityEngine.UIElements;
 
 namespace HouseBuilder.Editor
 {
+    using ObjectField = UnityEditor.UIElements.ObjectField;
+
     public class PropertyVisualElement<T> : VisualElement where T : UnityEngine.Object
     {
         private T _obj;

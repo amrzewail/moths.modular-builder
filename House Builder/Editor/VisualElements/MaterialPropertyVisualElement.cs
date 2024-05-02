@@ -7,6 +7,8 @@ using UnityEngine.UIElements;
 
 namespace HouseBuilder.Editor
 {
+    using ObjectField = UnityEditor.UIElements.ObjectField;
+
     public class MaterialPropertyVisualElement : VisualElement
     {
         public event Action<Material, Material> propertyChanged;
