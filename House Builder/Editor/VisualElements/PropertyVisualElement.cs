@@ -9,12 +9,10 @@ using UnityEngine.UIElements;
 
 namespace HouseBuilder.Editor
 {
-    using ObjectField = UnityEditor.UIElements.ObjectField;
-
     public class PropertyVisualElement<T> : VisualElement where T : UnityEngine.Object
     {
         private T _obj;
-        private ObjectField _propertyField;
+        private UnityEditor.UIElements.ObjectField _propertyField;
         private VisualElement _preview;
         private Label _previewLabel;
         private Button _deleteBtn;
@@ -22,7 +20,7 @@ namespace HouseBuilder.Editor
         public event Func<T, bool> propertyChanged;
         public event Action create;
 
-        public ObjectField propertyField => _propertyField;
+        public UnityEditor.UIElements.ObjectField propertyField => _propertyField;
         public Button deleteBtn => _deleteBtn;
 
         public string imageFallbackText { get => _previewLabel.text; set => _previewLabel.text = value; }
@@ -52,7 +50,7 @@ namespace HouseBuilder.Editor
             _deleteBtn.text = "X";
             _deleteBtn.RegisterCallback<ClickEvent>(DeleteClickCallback);
 
-            _propertyField = new ObjectField();
+            _propertyField = new UnityEditor.UIElements.ObjectField();
             _propertyField.objectType = typeof(T);
             _propertyField.allowSceneObjects = false;
             _propertyField.value = _obj;

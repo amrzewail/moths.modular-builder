@@ -72,7 +72,6 @@ namespace HouseBuilder.Editor.Views
             _header.Add(_heightTabs);
             _header.Add(_showAllLevels);
 
-
             _newHouseView = new VisualElement();
             _newHouseView.AddToClassList("new-house-view");
 

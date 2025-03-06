@@ -60,7 +60,7 @@ namespace HouseBuilder.Editor
             Logger = new Logger();
 
 
-            Input = new InputController(Logger);
+            Input = new Controllers.InputController(Logger);
             Grid = new SceneGrid();
             Palettes = new PaletteManager(Logger);
             Previewer = new PrefabPreviewer(Logger);

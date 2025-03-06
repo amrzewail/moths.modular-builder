@@ -7,8 +7,6 @@ using UnityEngine.UIElements;
 
 namespace HouseBuilder.Editor
 {
-    using ObjectField = UnityEditor.UIElements.ObjectField;
-
     public class MaterialPropertyVisualElement : VisualElement
     {
         public event Action<Material, Material> propertyChanged;
@@ -29,7 +27,7 @@ namespace HouseBuilder.Editor
         public Button replaceBtn => _replaceBtn;
         public Button selectBtn => _selectBtn;
 
-        public ObjectField propertyField => _property.propertyField;
+        public UnityEditor.UIElements.ObjectField propertyField => _property.propertyField;
 
         public Action<Material> replace;
         public Action<Material> select;
