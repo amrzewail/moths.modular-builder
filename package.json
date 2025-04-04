@@ -1,0 +1,25 @@
+{
+	"name": "com.moths.modular-builder",
+	"displayName": "Moths Modular Builder",
+	"version": "1.0.0",
+	"unity": "2022.3",
+	"description": "A tool for building structures using modular prefab pieces.",
+	"author": {
+		"name": "Amr Zewail",
+		"email": "amrzewail@hotmail.com",
+		"url": "https://github.com/amrzewail"
+	},
+	"dependencies": {
+	},
+	"changelog": {
+		"1.0.0": "- Initial release"
+	},
+	"samples": [
+		{
+			"displayName": "Building Sample",
+			"description": "",
+			"path": "Samples~/Building Sample"
+		}
+	],
+	"license": "MIT"
+}
