@@ -43,7 +43,7 @@ namespace Moths.ModularBuilder.Editor
 
 
 
-        [MenuItem("Tools/Modular Builder/Editor")]
+        [MenuItem("Moths/Modular Builder/Editor")]
         public static void ShowWindow()
         {
             BuilderEditor editor = GetWindow<BuilderEditor>();
