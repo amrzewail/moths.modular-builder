@@ -1,11 +1,11 @@
 using Moths.ModularBuilder.Data;
 using System;
-using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
 namespace Moths.ModularBuilder
 {
+    [SelectionBase]
     public class House : MonoBehaviour, IHouse
     {
         [System.Serializable]
